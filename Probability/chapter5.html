@@ -1,0 +1,1492 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Chapter 5 — Joint Probability Distributions</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-chtml.min.js" crossorigin="anonymous"></script>
+<style>
+  :root {
+    --gold: #F2B418;
+    --ice: #ECF8FD;
+    --steel: #AFCBD5;
+    --navy: #272838;
+    --clay: #815355;
+    --white: #FFFFFF;
+    --text: #1a1a2e;
+    --muted: #6b7280;
+    --green: #16a34a;
+    --green-bg: #dcfce7;
+    --red: #dc2626;
+    --red-bg: #fee2e2;
+    --yellow-bg: #fef9c3;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--ice);
+    color: var(--text);
+  }
+
+  /* NAV */
+  nav {
+    position: sticky; top: 0; z-index: 100;
+    background: var(--navy);
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 14px 32px;
+    box-shadow: 0 2px 16px rgba(39,40,56,0.25);
+  }
+  .nav-left { display: flex; align-items: center; gap: 16px; }
+  .nav-back {
+    color: var(--steel); text-decoration: none; font-size: 0.85rem;
+    display: flex; align-items: center; gap: 6px;
+    transition: color 0.2s;
+  }
+  .nav-back:hover { color: var(--gold); }
+  .nav-title { color: var(--white); font-weight: 600; font-size: 0.95rem; }
+  .nav-tabs { display: flex; gap: 4px; }
+  .nav-tab {
+    background: transparent; border: none; cursor: pointer;
+    color: var(--steel); font-size: 0.82rem; font-family: 'DM Sans', sans-serif;
+    padding: 7px 14px; border-radius: 20px; transition: all 0.2s;
+  }
+  .nav-tab:hover { background: rgba(255,255,255,0.08); color: var(--white); }
+  .nav-tab.active { background: var(--gold); color: var(--navy); font-weight: 600; }
+
+  /* HERO */
+  .hero {
+    background: linear-gradient(135deg, var(--navy) 0%, #1e2035 100%);
+    padding: 56px 32px 48px;
+    position: relative; overflow: hidden;
+  }
+  .hero::before {
+    content: '5'; position: absolute; right: 40px; top: 50%;
+    transform: translateY(-50%);
+    font-family: 'Playfair Display', serif;
+    font-size: 200px; color: rgba(255,255,255,0.04);
+    line-height: 1; user-select: none;
+  }
+  .hero-inner { max-width: 900px; margin: 0 auto; position: relative; z-index: 1; }
+  .hero-tag {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: rgba(242,180,24,0.15); border: 1px solid rgba(242,180,24,0.3);
+    color: var(--gold); font-size: 11px; font-weight: 700;
+    letter-spacing: 2px; text-transform: uppercase;
+    padding: 5px 14px; border-radius: 20px; margin-bottom: 20px;
+  }
+  .hero h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(1.8rem, 4vw, 2.8rem);
+    color: var(--white); line-height: 1.2; margin-bottom: 14px;
+  }
+  .hero h1 em { color: var(--gold); font-style: normal; }
+  .hero p { color: var(--steel); font-size: 0.97rem; font-weight: 300; line-height: 1.7; max-width: 560px; }
+  .hero-pills { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 24px; }
+  .hero-pill {
+    background: rgba(175,203,213,0.12); border: 1px solid rgba(175,203,213,0.25);
+    color: var(--steel); font-size: 0.78rem; padding: 5px 12px; border-radius: 14px;
+  }
+
+  /* CONTENT */
+  .content { max-width: 900px; margin: 0 auto; padding: 48px 24px; }
+
+  /* TABS CONTENT */
+  .tab-content { display: none; }
+  .tab-content.active { display: block; }
+
+  /* SUMMARY SECTIONS */
+  .summary-grid { display: grid; gap: 16px; }
+
+  .concept-card {
+    background: var(--white);
+    border-radius: 14px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(39,40,56,0.06);
+  }
+  .concept-header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 18px 24px;
+    cursor: pointer;
+    border-bottom: 1px solid transparent;
+    transition: background 0.2s;
+    user-select: none;
+  }
+  .concept-header:hover { background: var(--ice); }
+  .concept-header.open { border-bottom-color: rgba(175,203,213,0.3); }
+  .concept-title-wrap { display: flex; align-items: center; gap: 14px; }
+  .concept-num {
+    width: 32px; height: 32px; border-radius: 8px;
+    background: var(--gold); color: var(--navy);
+    font-size: 0.8rem; font-weight: 700;
+    display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+  }
+  .concept-title { font-weight: 600; font-size: 0.97rem; color: var(--navy); }
+  .concept-badge {
+    font-size: 10px; font-weight: 700; letter-spacing: 1px;
+    text-transform: uppercase; padding: 3px 8px; border-radius: 10px;
+    background: #fef3c7; color: #92400e;
+  }
+  .concept-badge.high { background: #fee2e2; color: #991b1b; }
+  .concept-chevron { color: var(--muted); transition: transform 0.3s; font-size: 0.9rem; }
+  .concept-header.open .concept-chevron { transform: rotate(180deg); }
+  .concept-body {
+    display: none;
+    padding: 20px 24px 24px;
+  }
+  .concept-body.open { display: block; }
+  .concept-body p { font-size: 0.9rem; line-height: 1.75; color: #374151; margin-bottom: 12px; }
+  .concept-body p:last-child { margin-bottom: 0; }
+
+  .formula-box {
+    background: var(--ice);
+    border-left: 4px solid var(--gold);
+    border-radius: 0 10px 10px 0;
+    padding: 14px 18px;
+    margin: 14px 0;
+    font-size: 0.9rem;
+  }
+  .trap-box {
+    background: #fff7ed;
+    border: 1px solid #fed7aa;
+    border-radius: 10px;
+    padding: 14px 18px;
+    margin-top: 14px;
+    font-size: 0.85rem;
+    color: #7c2d12;
+  }
+  .trap-box strong { display: block; margin-bottom: 4px; color: #c2410c; }
+
+  /* EXAMPLES */
+  .example-card {
+    background: var(--white);
+    border-radius: 16px;
+    overflow: hidden;
+    margin-bottom: 24px;
+    box-shadow: 0 2px 10px rgba(39,40,56,0.07);
+  }
+  .example-header {
+    background: var(--navy);
+    padding: 18px 28px;
+    display: flex; align-items: center; gap: 16px;
+  }
+  .ex-num {
+    background: var(--gold); color: var(--navy);
+    font-weight: 800; font-size: 0.8rem;
+    padding: 4px 10px; border-radius: 8px;
+  }
+  .example-header h3 { color: var(--white); font-size: 1rem; font-weight: 600; }
+  .example-body { padding: 24px 28px; }
+  .example-body p { font-size: 0.9rem; line-height: 1.7; color: #374151; margin-bottom: 12px; }
+
+  .prob-table {
+    width: 100%; border-collapse: collapse;
+    margin: 16px 0; font-size: 0.85rem;
+    border-radius: 10px; overflow: hidden;
+  }
+  .prob-table th {
+    background: var(--navy); color: var(--white);
+    padding: 10px 14px; text-align: center; font-weight: 600;
+  }
+  .prob-table td {
+    padding: 9px 14px; text-align: center;
+    border-bottom: 1px solid rgba(175,203,213,0.3);
+  }
+  .prob-table tr:nth-child(even) td { background: var(--ice); }
+  .prob-table td:first-child { font-weight: 600; color: var(--navy); background: #f8fafc; }
+
+  /* INTERACTIVE STEPS */
+  .steps-container { margin-top: 20px; }
+  .step {
+    border: 2px solid rgba(175,203,213,0.4);
+    border-radius: 12px;
+    padding: 16px 20px;
+    margin-bottom: 14px;
+    transition: border-color 0.3s;
+  }
+  .step.correct { border-color: var(--green); background: var(--green-bg); }
+  .step.wrong { border-color: var(--red); background: var(--red-bg); }
+  .step-question { font-size: 0.88rem; font-weight: 600; color: var(--navy); margin-bottom: 12px; }
+  .step-options { display: flex; flex-wrap: wrap; gap: 8px; }
+  .step-option {
+    background: var(--ice); border: 2px solid rgba(175,203,213,0.5);
+    border-radius: 8px; padding: 8px 16px; font-size: 0.85rem;
+    cursor: pointer; transition: all 0.2s; font-family: 'DM Sans', sans-serif;
+    color: var(--text);
+  }
+  .step-option:hover:not(:disabled) { border-color: var(--gold); background: #fffbeb; }
+  .step-option.selected-correct { background: var(--green-bg); border-color: var(--green); color: var(--green); font-weight: 600; }
+  .step-option.selected-wrong { background: var(--red-bg); border-color: var(--red); color: var(--red); font-weight: 600; }
+  .step-option.reveal-correct { background: var(--green-bg); border-color: var(--green); color: var(--green); }
+  .step-option:disabled { cursor: not-allowed; opacity: 0.7; }
+  .step-feedback {
+    margin-top: 10px; font-size: 0.84rem; line-height: 1.6;
+    display: none; padding: 10px 14px; border-radius: 8px;
+  }
+  .step-feedback.show { display: block; }
+  .step-feedback.correct-fb { background: #f0fdf4; color: #166534; }
+  .step-feedback.wrong-fb { background: #fff1f2; color: #991b1b; }
+
+  .show-solution-btn {
+    display: block; width: 100%; margin-top: 20px;
+    background: var(--navy); color: var(--white);
+    border: none; border-radius: 10px; padding: 12px;
+    font-size: 0.88rem; font-weight: 600; font-family: 'DM Sans', sans-serif;
+    cursor: pointer; transition: background 0.2s;
+  }
+  .show-solution-btn:hover { background: var(--clay); }
+  .full-solution {
+    display: none; margin-top: 16px;
+    background: #f8fafc; border-radius: 10px;
+    padding: 18px 20px; border-left: 4px solid var(--gold);
+  }
+  .full-solution.show { display: block; }
+  .full-solution h4 { font-size: 0.88rem; color: var(--navy); margin-bottom: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; }
+  .full-solution p { font-size: 0.87rem; line-height: 1.75; color: #374151; }
+
+  /* MOCK TEST */
+  .mock-header {
+    background: var(--navy); border-radius: 16px;
+    padding: 28px 32px; margin-bottom: 28px;
+    display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px;
+  }
+  .mock-header h2 { font-family: 'Playfair Display', serif; color: var(--white); font-size: 1.5rem; }
+  .mock-header p { color: var(--steel); font-size: 0.85rem; margin-top: 4px; }
+  .mock-timer {
+    background: rgba(242,180,24,0.15); border: 1px solid var(--gold);
+    border-radius: 10px; padding: 12px 20px; text-align: center;
+  }
+  .mock-timer .timer-val { font-family: 'Playfair Display', serif; font-size: 2rem; color: var(--gold); }
+  .mock-timer .timer-label { font-size: 0.75rem; color: var(--steel); letter-spacing: 1px; }
+
+  .mock-section-title {
+    font-size: 11px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase;
+    color: var(--clay); margin: 32px 0 16px; display: flex; align-items: center; gap: 10px;
+  }
+  .mock-section-title::after { content: ''; flex: 1; height: 1px; background: rgba(175,203,213,0.5); }
+
+  .mock-q {
+    background: var(--white); border-radius: 14px; padding: 22px 26px;
+    margin-bottom: 16px; box-shadow: 0 2px 8px rgba(39,40,56,0.05);
+    border: 2px solid transparent; transition: border-color 0.3s;
+  }
+  .mock-q.answered-correct { border-color: var(--green); }
+  .mock-q.answered-wrong { border-color: var(--red); }
+  .mock-q-num { font-size: 11px; font-weight: 700; color: var(--gold); letter-spacing: 1px; margin-bottom: 8px; }
+  .mock-q-text { font-size: 0.92rem; color: var(--navy); font-weight: 500; line-height: 1.6; margin-bottom: 16px; }
+  .mock-opts { display: flex; flex-direction: column; gap: 8px; }
+  .mock-opt {
+    display: flex; align-items: center; gap: 12px;
+    padding: 11px 16px; border-radius: 10px;
+    border: 1.5px solid rgba(175,203,213,0.4);
+    cursor: pointer; transition: all 0.2s;
+    font-size: 0.88rem; background: var(--ice);
+  }
+  .mock-opt:hover:not(.disabled) { border-color: var(--gold); background: #fffbeb; }
+  .mock-opt.selected { border-color: var(--navy); background: #f0f4ff; font-weight: 500; }
+  .mock-opt.correct-ans { border-color: var(--green); background: var(--green-bg); color: var(--green); font-weight: 600; }
+  .mock-opt.wrong-ans { border-color: var(--red); background: var(--red-bg); color: var(--red); }
+  .mock-opt.disabled { cursor: not-allowed; }
+  .opt-letter {
+    width: 26px; height: 26px; border-radius: 6px;
+    background: rgba(175,203,213,0.3); color: var(--navy);
+    font-weight: 700; font-size: 0.78rem;
+    display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+  }
+  .mock-opt.correct-ans .opt-letter { background: var(--green); color: white; }
+  .mock-opt.wrong-ans .opt-letter { background: var(--red); color: white; }
+  .mock-q-feedback { font-size: 0.82rem; margin-top: 12px; padding: 10px 14px; border-radius: 8px; display: none; }
+  .mock-q-feedback.show { display: block; }
+  .mock-q-feedback.fb-correct { background: #f0fdf4; color: #166534; }
+  .mock-q-feedback.fb-wrong { background: #fff1f2; color: #991b1b; }
+
+  /* Short answer */
+  .mock-short textarea {
+    width: 100%; padding: 12px 14px;
+    border: 1.5px solid rgba(175,203,213,0.4);
+    border-radius: 10px; font-family: 'DM Sans', sans-serif;
+    font-size: 0.88rem; resize: vertical; min-height: 80px;
+    background: var(--ice); color: var(--text);
+    transition: border-color 0.2s;
+  }
+  .mock-short textarea:focus { outline: none; border-color: var(--gold); }
+  .mock-short .check-btn {
+    margin-top: 10px; padding: 9px 20px;
+    background: var(--navy); color: var(--white); border: none;
+    border-radius: 8px; font-family: 'DM Sans', sans-serif;
+    font-size: 0.85rem; font-weight: 600; cursor: pointer;
+    transition: background 0.2s;
+  }
+  .mock-short .check-btn:hover { background: var(--clay); }
+
+  /* Calc question */
+  .calc-input-wrap { display: flex; gap: 10px; align-items: center; margin-top: 12px; flex-wrap: wrap; }
+  .calc-input {
+    padding: 10px 14px; border: 1.5px solid rgba(175,203,213,0.4);
+    border-radius: 10px; font-family: 'DM Sans', sans-serif; font-size: 0.9rem;
+    background: var(--ice); color: var(--text); width: 130px;
+    transition: border-color 0.2s;
+  }
+  .calc-input:focus { outline: none; border-color: var(--gold); }
+  .calc-btn {
+    padding: 10px 20px; background: var(--gold); color: var(--navy);
+    border: none; border-radius: 10px; font-weight: 700; font-size: 0.85rem;
+    cursor: pointer; font-family: 'DM Sans', sans-serif; transition: opacity 0.2s;
+  }
+  .calc-btn:hover { opacity: 0.85; }
+
+  /* RESULTS */
+  .results-panel {
+    display: none; background: var(--navy); border-radius: 16px;
+    padding: 36px; margin-top: 32px; text-align: center;
+  }
+  .results-panel.show { display: block; }
+  .results-score {
+    font-family: 'Playfair Display', serif; font-size: 4rem;
+    color: var(--gold); line-height: 1;
+  }
+  .results-label { color: var(--steel); font-size: 0.9rem; margin-top: 6px; margin-bottom: 24px; }
+  .results-bars { display: flex; gap: 24px; justify-content: center; flex-wrap: wrap; margin-bottom: 24px; }
+  .result-stat { text-align: center; }
+  .result-stat .val { font-size: 1.6rem; font-weight: 700; color: var(--white); }
+  .result-stat .lbl { font-size: 0.78rem; color: var(--steel); margin-top: 2px; }
+  .retry-btn {
+    background: var(--gold); color: var(--navy); border: none;
+    padding: 12px 32px; border-radius: 30px; font-weight: 700;
+    font-size: 0.95rem; cursor: pointer; font-family: 'DM Sans', sans-serif;
+    transition: opacity 0.2s;
+  }
+  .retry-btn:hover { opacity: 0.85; }
+
+  .submit-wrap { margin-top: 32px; text-align: center; }
+  .submit-btn {
+    background: var(--gold); color: var(--navy);
+    border: none; border-radius: 30px; padding: 14px 48px;
+    font-size: 1rem; font-weight: 700; cursor: pointer;
+    font-family: 'DM Sans', sans-serif;
+    box-shadow: 0 4px 16px rgba(242,180,24,0.35);
+    transition: all 0.2s;
+  }
+  .submit-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(242,180,24,0.4); }
+  .submit-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+  /* PROGRESS */
+  .progress-bar-wrap { height: 4px; background: rgba(175,203,213,0.3); border-radius: 2px; margin-bottom: 32px; }
+  .progress-bar { height: 4px; background: var(--gold); border-radius: 2px; transition: width 0.4s; }
+
+  /* CHEAT SHEET */
+  .cheat-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 14px; }
+  .cheat-card {
+    background: var(--white); border-radius: 12px; padding: 20px 22px;
+    border-top: 4px solid var(--gold);
+    box-shadow: 0 2px 8px rgba(39,40,56,0.05);
+  }
+  .cheat-card h4 { font-size: 0.88rem; font-weight: 700; color: var(--navy); margin-bottom: 10px; }
+  .cheat-card .formula { font-size: 0.85rem; color: #374151; line-height: 1.8; }
+  .cheat-card .note { font-size: 0.78rem; color: var(--muted); margin-top: 8px; line-height: 1.6; }
+
+  .trap-list { list-style: none; display: flex; flex-direction: column; gap: 8px; margin-top: 24px; }
+  .trap-list li {
+    background: #fff7ed; border-radius: 10px; padding: 12px 16px;
+    font-size: 0.85rem; color: #7c2d12; border-left: 4px solid #f97316;
+  }
+  .trap-list li strong { display: block; color: #c2410c; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 2px; }
+
+  /* Utility */
+  .section-label {
+    font-size: 11px; font-weight: 700; letter-spacing: 2px;
+    text-transform: uppercase; color: var(--muted); margin-bottom: 20px;
+    display: flex; align-items: center; gap: 10px;
+  }
+  .section-label::after { content: ''; flex: 1; height: 1px; background: rgba(175,203,213,0.4); }
+
+  @media (max-width: 600px) {
+    nav { flex-direction: column; align-items: flex-start; gap: 10px; }
+    .nav-tabs { width: 100%; overflow-x: auto; }
+    .hero { padding: 36px 20px 32px; }
+    .hero::before { display: none; }
+    .content { padding: 28px 16px; }
+    .example-header { padding: 14px 18px; }
+    .example-body { padding: 16px 18px; }
+    .mock-header { flex-direction: column; }
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-left">
+    <a href="index.html" class="nav-back">← All Chapters</a>
+    <span style="color:rgba(255,255,255,0.2)">|</span>
+    <span class="nav-title">Chapter 5</span>
+  </div>
+  <div class="nav-tabs">
+    <button class="nav-tab active" onclick="switchTab('summary')">📖 Summary</button>
+    <button class="nav-tab" onclick="switchTab('examples')">🧮 Examples</button>
+    <button class="nav-tab" onclick="switchTab('mock')">🧪 Mock Test</button>
+    <button class="nav-tab" onclick="switchTab('cheatsheet')">⚡ Cheat Sheet</button>
+  </div>
+</nav>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-inner">
+    <div class="hero-tag">Chapter 5</div>
+    <h1>Joint Probability<br><em>Distributions</em></h1>
+    <p>Two random variables, joint tables, marginals, conditional distributions, independence, covariance, and correlation.</p>
+    <div class="hero-pills">
+      <span class="hero-pill">12 Concepts</span>
+      <span class="hero-pill">12 Worked Examples</span>
+      <span class="hero-pill">12-Question Mock Test</span>
+    </div>
+  </div>
+</div>
+
+<div class="content">
+
+<!-- ===== SUMMARY TAB ===== -->
+<div id="tab-summary" class="tab-content active">
+  <p class="section-label">Core Concepts</p>
+  <div class="summary-grid" id="concepts-grid"></div>
+</div>
+
+<!-- ===== EXAMPLES TAB ===== -->
+<div id="tab-examples" class="tab-content">
+  <p class="section-label">Worked Examples — Try Each Step Before Revealing</p>
+  <div id="examples-container"></div>
+</div>
+
+<!-- ===== MOCK TEST TAB ===== -->
+<div id="tab-mock" class="tab-content">
+  <div class="mock-header">
+    <div>
+      <h2>Mock Exam</h2>
+      <p>12 questions · Sections A, B & C · Auto-graded with explanations</p>
+    </div>
+    <div class="mock-timer">
+      <div class="timer-val" id="timer-display">20:00</div>
+      <div class="timer-label">REMAINING</div>
+    </div>
+  </div>
+  <div class="progress-bar-wrap"><div class="progress-bar" id="mock-progress" style="width:0%"></div></div>
+  <div id="mock-container"></div>
+  <div class="submit-wrap">
+    <button class="submit-btn" id="submit-btn" onclick="submitMock()">Submit Exam</button>
+  </div>
+  <div class="results-panel" id="results-panel">
+    <div class="results-score" id="results-score">0/12</div>
+    <div class="results-label">Total Score</div>
+    <div class="results-bars">
+      <div class="result-stat"><div class="val" id="res-mcq">0/5</div><div class="lbl">Section A · MCQ</div></div>
+      <div class="result-stat"><div class="val" id="res-calc">0/4</div><div class="lbl">Section C · Calc</div></div>
+      <div class="result-stat"><div class="val" id="res-pct">0%</div><div class="lbl">Percentage</div></div>
+    </div>
+    <button class="retry-btn" onclick="resetMock()">Retry Test</button>
+  </div>
+</div>
+
+<!-- ===== CHEAT SHEET TAB ===== -->
+<div id="tab-cheatsheet" class="tab-content">
+  <p class="section-label">Formula Reference</p>
+  <div class="cheat-grid" id="cheat-grid"></div>
+  <p class="section-label" style="margin-top:36px">Common Exam Traps</p>
+  <ul class="trap-list" id="trap-list"></ul>
+</div>
+
+</div><!-- end .content -->
+
+<script>
+// ===================== DATA =====================
+
+const concepts = [
+  {
+    num: '01', title: 'Joint Probability Mass Function',
+    importance: 'KEY',
+    body: `<p>When we study <strong>two random variables simultaneously</strong>, we use a joint PMF. Instead of asking about X alone, we ask: what is the probability that X = x AND Y = y at the same time?</p>
+    <div class="formula-box">
+      <strong>Definition:</strong><br>
+      \\( p(x,y) = P(X=x,\\, Y=y) \\)<br><br>
+      <strong>Conditions:</strong><br>
+      1. \\( p(x,y) \\geq 0 \\) for all (x, y)<br>
+      2. \\( \\displaystyle\\sum_x \\sum_y p(x,y) = 1 \\) — all probabilities sum to 1
+    </div>
+    <div class="trap-box"><strong>⚠️ Exam Trap</strong> The double summation must equal exactly 1. If a table doesn't sum to 1, there's a missing probability to find.</div>`
+  },
+  {
+    num: '02', title: 'Marginal Probability',
+    importance: 'VERY IMPORTANT',
+    body: `<p>To find the distribution of <strong>one variable only</strong>, sum over all values of the other variable. Think of it as "collapsing" the table.</p>
+    <div class="formula-box">
+      <strong>For X (sum across each row):</strong><br>
+      \\( P(X=x) = \\displaystyle\\sum_y P(X=x, Y=y) \\)<br><br>
+      <strong>For Y (sum down each column):</strong><br>
+      \\( P(Y=y) = \\displaystyle\\sum_x P(X=x, Y=y) \\)
+    </div>
+    <p>💡 Intuition: you're "ignoring" the other variable by adding up all possibilities for it.</p>`
+  },
+  {
+    num: '03', title: 'Conditional Probability',
+    importance: 'KEY',
+    body: `<p>Given that we <strong>know</strong> the value of one variable, what is the distribution of the other?</p>
+    <div class="formula-box">
+      \\( P(X=x \\mid Y=y) = \\dfrac{P(X=x,\\, Y=y)}{P(Y=y)} \\)<br><br>
+      \\( P(Y=y \\mid X=x) = \\dfrac{P(X=x,\\, Y=y)}{P(X=x)} \\)
+    </div>
+    <p>✅ Always verify: \\( \\sum_y P(Y=y \\mid X=x) = 1 \\)</p>`
+  },
+  {
+    num: '04', title: 'Independence',
+    importance: 'HIGHLY TESTED',
+    body: `<p>X and Y are <strong>independent</strong> if knowing the value of one gives no information about the other.</p>
+    <div class="formula-box">
+      <strong>Test:</strong> \\( P(X=x,\\, Y=y) = P(X=x) \\cdot P(Y=y) \\) for ALL (x, y)
+    </div>
+    <div class="trap-box"><strong>⚠️ Critical Rule</strong> If even ONE pair (x, y) fails this test → the variables are NOT independent. You must check every single cell in the table.</div>
+    <p style="margin-top:12px">Equivalently: \\( f_{Y|X}(y|x) = f_Y(y) \\) — conditional = marginal.</p>`
+  },
+  {
+    num: '05', title: 'Expected Values',
+    importance: 'STANDARD',
+    body: `<p>The mean of each variable, computed using the joint distribution:</p>
+    <div class="formula-box">
+      \\( E(X) = \\displaystyle\\sum_x \\sum_y x \\cdot p(x,y) \\)<br><br>
+      \\( E(Y) = \\displaystyle\\sum_x \\sum_y y \\cdot p(x,y) \\)<br><br>
+      \\( E[g(X,Y)] = \\displaystyle\\sum_x \\sum_y g(x,y) \\cdot p(x,y) \\)
+    </div>`
+  },
+  {
+    num: '06', title: 'Covariance',
+    importance: 'NEW CONCEPT',
+    body: `<p>Covariance measures how X and Y <strong>move together</strong>.</p>
+    <div class="formula-box">
+      \\( Cov(X,Y) = E(XY) - E(X)E(Y) \\)<br><br>
+      where \\( E(XY) = \\displaystyle\\sum_x \\sum_y xy \\cdot p(x,y) \\)
+    </div>
+    <p>Interpretation:</p>
+    <ul style="font-size:0.88rem;line-height:1.9;padding-left:18px;color:#374151">
+      <li><strong>Positive</strong> → X and Y increase together</li>
+      <li><strong>Negative</strong> → one increases as the other decreases</li>
+      <li><strong>Zero</strong> → no linear relationship (but could still be dependent!)</li>
+    </ul>`
+  },
+  {
+    num: '07', title: 'Correlation Coefficient',
+    importance: 'IMPORTANT',
+    body: `<p>A <strong>standardized</strong> version of covariance — always between −1 and 1.</p>
+    <div class="formula-box">
+      \\( \\rho = \\dfrac{Cov(X,Y)}{\\sigma_X \\cdot \\sigma_Y} \\)
+    </div>
+    <ul style="font-size:0.88rem;line-height:1.9;padding-left:18px;color:#374151">
+      <li>\\( \\rho = 1 \\): perfect positive linear relationship</li>
+      <li>\\( \\rho = -1 \\): perfect negative linear relationship</li>
+      <li>\\( \\rho = 0 \\): no linear relationship</li>
+    </ul>
+    <div class="trap-box"><strong>Key Fact</strong> If Y = aX + b (linear), then |ρ| = 1 exactly.</div>`
+  },
+  {
+    num: '08', title: 'Key Identities',
+    importance: 'EXAM TRAP',
+    body: `<p>These are tested constantly. Know which one always holds and which requires independence.</p>
+    <div class="formula-box">
+      <strong>ALWAYS TRUE:</strong><br>
+      \\( E(X+Y) = E(X) + E(Y) \\)<br>
+      \\( E(aX + bY) = aE(X) + bE(Y) \\)<br><br>
+      <strong>ONLY IF X, Y ARE INDEPENDENT:</strong><br>
+      \\( Var(X+Y) = Var(X) + Var(Y) \\)<br>
+      \\( Var(aX + bY) = a^2 Var(X) + b^2 Var(Y) \\)
+    </div>
+    <div class="trap-box"><strong>⚠️ Most common mistake</strong> Using Var(X+Y) = Var(X) + Var(Y) when X and Y are NOT independent. Always check independence first.</div>`
+  },
+];
+
+// ===================== EXAMPLES DATA =====================
+const examples = [
+  {
+    id: 'ex51', num: 'Ex 5.1', title: 'Joint Distribution — Mobile Response Time',
+    question: `The response time of a mobile website depends on signal strength. Let X = number of signal bars and Y = response time (in seconds). The joint probability distribution f(x,y) is given below.
+    <br><br>(a) What does the joint distribution represent? &nbsp; (b) What is the range of (X,Y)?`,
+    table: {
+      headers: ['X \\ Y', 'Y=1', 'Y=2', 'Y=3', 'Y=4'],
+      rows: [
+        ['X=1', '0.01', '0.02', '0.02', '0.05'],
+        ['X=2', '0.02', '0.04', '0.04', '0.13'],
+        ['X=3', '0.02', '0.08', '0.05', '0.07'],
+        ['X=4', '0.10', '0.15', '0.10', '0.10'],
+      ]
+    },
+    steps: [
+      {
+        q: 'What does the joint probability P(X=x, Y=y) represent?',
+        opts: [
+          'The probability that X = x only',
+          'The probability that Y = y only',
+          'The probability that both X = x AND Y = y occur simultaneously',
+          'The marginal probability of X'
+        ],
+        correct: 2,
+        fb_correct: '✓ Correct! The joint PMF gives the probability that both variables take specific values at the same time.',
+        fb_wrong: 'P(X=x, Y=y) is the probability of both X=x AND Y=y occurring simultaneously.'
+      },
+      {
+        q: 'What is the range of (X, Y)?',
+        opts: [
+          'All real numbers',
+          'All pairs (x,y) where P(X=x, Y=y) = 0',
+          'All pairs (x,y) where P(X=x, Y=y) > 0',
+          'Only pairs where x = y'
+        ],
+        correct: 2,
+        fb_correct: '✓ Correct! The range is all (x,y) pairs that have positive probability.',
+        fb_wrong: 'The range of (X,Y) is the set of all pairs (x,y) where the joint probability is greater than 0.'
+      },
+      {
+        q: 'Verify: do all probabilities in the table sum to 1?',
+        opts: [
+          'No, they sum to less than 1',
+          'Yes — the total is exactly 1.00',
+          'No, they sum to more than 1',
+          'Cannot be determined'
+        ],
+        correct: 1,
+        fb_correct: '✓ Summing all entries: 0.01+0.02+0.02+0.05+0.02+0.04+0.04+0.13+0.02+0.08+0.05+0.07+0.10+0.15+0.10+0.10 = 1.00 ✅',
+        fb_wrong: 'Sum all 16 entries: they total exactly 1.00. This is a required condition for a valid PMF.'
+      }
+    ],
+    solution: `<h4>Full Solution</h4>
+<p><strong>(a)</strong> The joint probability distribution represents \\( P(X=x, Y=y) \\) — the probability that <em>both</em> X and Y take their specified values simultaneously.</p>
+<p style="margin-top:10px"><strong>(b)</strong> The range of (X, Y) is the set of all pairs (x, y) for which \\( P(X=x, Y=y) > 0 \\).<br>
+Here X ∈ {1, 2, 3, 4} and Y ∈ {1, 2, 3, 4}, giving 16 valid pairs.</p>
+<p style="margin-top:10px">✓ Validity check: \\( \\sum_x \\sum_y p(x,y) = 1.00 \\) ✅</p>`
+  },
+  {
+    id: 'ex53', num: 'Ex 5.3', title: 'Marginal Distribution',
+    question: `Given the joint probability table of X and Y below, find the marginal distributions of X and Y.`,
+    table: {
+      headers: ['X \\ Y', 'Y=1', 'Y=2', 'Y=3'],
+      rows: [
+        ['X=1', '0.10', '0.15', '0.05'],
+        ['X=2', '0.20', '0.30', '0.10'],
+        ['X=3', '0.05', '0.03', '0.02'],
+      ]
+    },
+    steps: [
+      {
+        q: 'To find P(X=1), which operation do you perform?',
+        opts: ['Multiply all values in row 1', 'Sum all values in row 1', 'Divide by P(Y)', 'Sum all values in column 1'],
+        correct: 1,
+        fb_correct: '✓ Correct! Marginal P(X=x) = Σ_y P(X=x, Y=y) — sum across the row.',
+        fb_wrong: 'Marginal P(X=x) = Σ_y P(X=x, Y=y) — we sum across the row.'
+      },
+      {
+        q: 'What is P(X=1)?',
+        opts: ['0.05', '0.20', '0.30', '0.10 + 0.15 + 0.05 = 0.30'],
+        correct: 3,
+        fb_correct: '✓ P(X=1) = 0.10 + 0.15 + 0.05 = 0.30',
+        fb_wrong: 'P(X=1) = 0.10 + 0.15 + 0.05 = 0.30 (sum all entries in row 1).'
+      },
+      {
+        q: 'What is P(Y=2)?',
+        opts: ['0.30', '0.15 + 0.30 + 0.03 = 0.48', '0.30 + 0.15 = 0.45', '0.10'],
+        correct: 1,
+        fb_correct: '✓ P(Y=2) = 0.15 + 0.30 + 0.03 = 0.48 (sum down column Y=2).',
+        fb_wrong: 'P(Y=2) = Σ_x P(X=x, Y=2) = 0.15 + 0.30 + 0.03 = 0.48.'
+      }
+    ],
+    solution: `<h4>Full Solution</h4>
+<p><strong>Marginal of X</strong> — sum each row:<br>
+\\( P(X=1) = 0.10 + 0.15 + 0.05 = 0.30 \\)<br>
+\\( P(X=2) = 0.20 + 0.30 + 0.10 = 0.60 \\)<br>
+\\( P(X=3) = 0.05 + 0.03 + 0.02 = 0.10 \\)</p>
+<p style="margin-top:10px"><strong>Marginal of Y</strong> — sum each column:<br>
+\\( P(Y=1) = 0.10 + 0.20 + 0.05 = 0.35 \\)<br>
+\\( P(Y=2) = 0.15 + 0.30 + 0.03 = 0.48 \\)<br>
+\\( P(Y=3) = 0.05 + 0.10 + 0.02 = 0.17 \\)</p>
+<p style="margin-top:10px">✓ Check: 0.30 + 0.60 + 0.10 = 1.00 ✅ &nbsp;&nbsp; 0.35 + 0.48 + 0.17 = 1.00 ✅</p>`
+  },
+  {
+    id: 'ex55', num: 'Ex 5.5', title: 'Conditional Probability',
+    question: 'Using the mobile response time example: P(X=3) = 0.22. Find P(Y=2 | X=3) given P(X=3, Y=2) = 0.08.',
+    steps: [
+      {
+        q: 'What formula do you use for conditional probability P(Y=2 | X=3)?',
+        opts: [
+          'P(X=3) × P(Y=2)',
+          'P(X=3, Y=2) / P(X=3)',
+          'P(Y=2) / P(X=3)',
+          'P(X=3) / P(X=3, Y=2)'
+        ],
+        correct: 1,
+        fb_correct: '✓ Correct! P(Y=y | X=x) = P(X=x, Y=y) / P(X=x)',
+        fb_wrong: 'Conditional formula: P(Y=y | X=x) = P(X=x, Y=y) / P(X=x)'
+      },
+      {
+        q: 'What is P(Y=2 | X=3)?',
+        opts: ['0.08 / 0.22 ≈ 0.364', '0.22 / 0.08 ≈ 2.75', '0.08 × 0.22 ≈ 0.018', '0.08 + 0.22 = 0.30'],
+        correct: 0,
+        fb_correct: '✓ P(Y=2|X=3) = 0.08 / 0.22 ≈ 0.364',
+        fb_wrong: 'P(Y=2|X=3) = P(X=3,Y=2) / P(X=3) = 0.08 / 0.22 ≈ 0.364'
+      },
+      {
+        q: 'Which check verifies the full conditional distribution is valid?',
+        opts: [
+          'P(Y=2|X=3) = P(Y=2)',
+          'P(Y=1|X=3) + P(Y=2|X=3) + P(Y=3|X=3) + P(Y=4|X=3) = 1',
+          'P(X=3) = 1',
+          'P(Y=2|X=3) > P(X=3)'
+        ],
+        correct: 1,
+        fb_correct: '✓ All conditional probabilities given X=3 must sum to 1. This verifies the distribution is valid.',
+        fb_wrong: 'The conditional PMF must sum to 1: Σ_y P(Y=y|X=3) = 1.'
+      }
+    ],
+    solution: `<h4>Full Solution</h4>
+<p>\\( P(Y=2 \\mid X=3) = \\dfrac{P(X=3,Y=2)}{P(X=3)} = \\dfrac{0.08}{0.22} \\approx 0.364 \\)</p>
+<p style="margin-top:10px">All conditional probabilities for X=3 must sum to 1:<br>
+\\( P(Y=1|X=3) + P(Y=2|X=3) + P(Y=3|X=3) + P(Y=4|X=3) = 1 \\) ✅</p>`
+  },
+  {
+    id: 'ex57', num: 'Ex 5.7', title: 'Conditional Mean & Variance',
+    question: `Using the conditional distribution of Y given X=3, the conditional probabilities are:
+    P(Y=1|X=3)=0.454, P(Y=2|X=3)=0.364, P(Y=3|X=3)=0.091, P(Y=4|X=3)=0.091.
+    <br><br>Find: (a) E(Y|X=3) &nbsp; (b) Var(Y|X=3)`,
+    steps: [
+      {
+        q: 'What is the formula for E(Y|X=3)?',
+        opts: [
+          'E(Y|3) = Σ y × P(Y=y)',
+          'E(Y|3) = Σ y × P(Y=y|X=3)',
+          'E(Y|3) = Σ y² × P(Y=y|X=3)',
+          'E(Y|3) = E(Y) / P(X=3)'
+        ],
+        correct: 1,
+        fb_correct: '✓ Correct! Use the conditional probabilities P(Y=y|X=3), not the marginal P(Y=y).',
+        fb_wrong: 'E(Y|X=3) = Σ y · P(Y=y|X=3) — use conditional probabilities.'
+      },
+      {
+        q: 'Calculate E(Y|X=3):',
+        opts: [
+          '1(0.454) + 2(0.364) + 3(0.091) + 4(0.091) = 1.82',
+          '(1+2+3+4) / 4 = 2.5',
+          '1(0.454) + 2(0.364) = 1.182',
+          '0.454 + 0.364 + 0.091 + 0.091 = 1.0'
+        ],
+        correct: 0,
+        fb_correct: '✓ E(Y|3) = 0.454 + 0.728 + 0.273 + 0.364 = 1.82',
+        fb_wrong: 'E(Y|3) = 1(0.454)+2(0.364)+3(0.091)+4(0.091) = 0.454+0.728+0.273+0.364 = 1.82'
+      },
+      {
+        q: 'Var(Y|X=3) = Σ (y − 1.82)² × P(Y=y|X=3). What is the result?',
+        opts: ['0.88', '1.64', '3.32', '0.25'],
+        correct: 0,
+        fb_correct: '✓ Var(Y|3) = (1−1.82)²(0.454) + (2−1.82)²(0.364) + (3−1.82)²(0.091) + (4−1.82)²(0.091) ≈ 0.88',
+        fb_wrong: 'Var(Y|3) = Σ(y−1.82)²·P(Y=y|X=3) = 0.305 + 0.012 + 0.127 + 0.431 ≈ 0.88'
+      }
+    ],
+    solution: `<h4>Full Solution</h4>
+<p><strong>(a) Conditional Mean:</strong></p>
+<p>\\( E(Y|3) = 1(0.454)+2(0.364)+3(0.091)+4(0.091) \\)<br>
+\\( = 0.454 + 0.728 + 0.273 + 0.364 = \\mathbf{1.82} \\)</p>
+<p style="margin-top:12px"><strong>(b) Conditional Variance:</strong></p>
+<p>\\( Var(Y|3) = \\sum (y-1.82)^2 \\cdot f(y|3) \\)<br>
+\\( = (1-1.82)^2(0.454)+(2-1.82)^2(0.364)+(3-1.82)^2(0.091)+(4-1.82)^2(0.091) \\)<br>
+\\( = 0.305 + 0.012 + 0.127 + 0.431 = \\mathbf{0.88} \\)</p>`
+  },
+  {
+    id: 'ex58', num: 'Ex 5.8', title: 'Testing Independence',
+    question: 'A physician studies X = billing errors and Y = X-rays ordered. P(X=1) = 0.2, P(Y=2) = 0.25. Given P(X=1, Y=2) = 0.05, are X and Y independent?',
+    steps: [
+      {
+        q: 'What is the independence condition to check?',
+        opts: [
+          'P(X=1, Y=2) = P(X=1) + P(Y=2)',
+          'P(X=1, Y=2) = P(X=1) × P(Y=2)',
+          'P(X=1, Y=2) > 0',
+          'P(X=1) = P(Y=2)'
+        ],
+        correct: 1,
+        fb_correct: '✓ Independence requires P(X=x, Y=y) = P(X=x) × P(Y=y) for ALL (x,y) pairs.',
+        fb_wrong: 'Independence test: P(X=x, Y=y) = P(X=x) × P(Y=y) for every pair (x,y).'
+      },
+      {
+        q: 'Calculate P(X=1) × P(Y=2):',
+        opts: ['0.2 + 0.25 = 0.45', '0.2 × 0.25 = 0.05', '0.2 / 0.25 = 0.80', '0.25 − 0.2 = 0.05'],
+        correct: 1,
+        fb_correct: '✓ 0.2 × 0.25 = 0.05',
+        fb_wrong: 'Multiply the two marginals: 0.2 × 0.25 = 0.05'
+      },
+      {
+        q: 'Since P(X=1, Y=2) = 0.05 and P(X=1)×P(Y=2) = 0.05, what do we conclude?',
+        opts: ['They are dependent', 'They are independent (all pairs must be checked)', 'Cannot determine', 'Need more data'],
+        correct: 1,
+        fb_correct: '✓ This pair satisfies independence. If ALL pairs (x,y) satisfy this condition → X and Y are independent.',
+        fb_wrong: 'The values match for this pair. If this holds for every pair in the table → X and Y are independent.'
+      }
+    ],
+    solution: `<h4>Full Solution</h4>
+<p>Check: \\( P(X=1,Y=2) = P(X=1) \\cdot P(Y=2) \\)?</p>
+<p>\\( 0.2 \\times 0.25 = 0.05 = P(X=1,Y=2) \\) ✅</p>
+<p style="margin-top:10px">This pair satisfies independence. In this problem, all pairs satisfy the condition → X and Y are <strong>independent</strong>.</p>
+<p style="margin-top:10px">We can then use: \\( P(X=1, Y=2) = P(X=1) \\times P(Y=2) = 0.2 \\times 0.25 = \\mathbf{0.05} \\)</p>`
+  },
+  {
+    id: 'ex514', num: 'Ex 5.14', title: 'Marginal Distribution — Three Variables',
+    question: `Three variables X₁, X₂, X₃ satisfy x₁ + x₂ + x₃ = 3. There are 10 equally likely sample points, each with probability 0.1.
+    <br><br>Find: (a) The marginal distribution of X₂ &nbsp; (b) E(X₂)`,
+    table: {
+      headers: ['X₂ value', 'Probability P(X₂ = x₂)'],
+      rows: [
+        ['0', '0.4'],
+        ['1', '0.3'],
+        ['2', '0.2'],
+        ['3', '0.1'],
+      ]
+    },
+    steps: [
+      {
+        q: 'How do you find the marginal distribution of X₂ from a three-variable joint distribution?',
+        opts: [
+          'Sum over all values of X₂',
+          'Sum over all values of X₁ and X₃ (the other variables)',
+          'Divide each joint probability by P(X₂)',
+          'Multiply the three marginals together'
+        ],
+        correct: 1,
+        fb_correct: '✓ Correct! Marginalize by summing over all values of the variables you want to eliminate (X₁ and X₃).',
+        fb_wrong: 'P(X₂=x₂) = Σ_{x₁,x₃} P(X₁=x₁, X₂=x₂, X₃=x₃) — sum over all other variables.'
+      },
+      {
+        q: 'What is P(X₂ = 0)? (Count how many of the 10 equally likely points have X₂ = 0)',
+        opts: ['0.1', '0.2', '0.3', '0.4'],
+        correct: 3,
+        fb_correct: '✓ P(X₂=0) = 0.4 — four of the 10 equally likely points have X₂=0.',
+        fb_wrong: '4 out of 10 points have X₂=0, so P(X₂=0) = 4 × 0.1 = 0.4.'
+      },
+      {
+        q: 'Calculate E(X₂) = 0(0.4) + 1(0.3) + 2(0.2) + 3(0.1):',
+        opts: ['0.5', '1.0', '1.5', '2.0'],
+        correct: 1,
+        fb_correct: '✓ E(X₂) = 0 + 0.3 + 0.4 + 0.3 = 1.0',
+        fb_wrong: 'E(X₂) = 0(0.4)+1(0.3)+2(0.2)+3(0.1) = 0+0.3+0.4+0.3 = 1.0'
+      }
+    ],
+    solution: `<h4>Full Solution</h4>
+<p><strong>(a) Marginal distribution of X₂:</strong><br>
+\\( P(X_2=0) = 0.4, \\quad P(X_2=1) = 0.3, \\quad P(X_2=2) = 0.2, \\quad P(X_2=3) = 0.1 \\)</p>
+<p style="margin-top:10px"><strong>(b) Expected value:</strong><br>
+\\( E(X_2) = 0(0.4)+1(0.3)+2(0.2)+3(0.1) = 0+0.3+0.4+0.3 = \\mathbf{1} \\)</p>`
+  },
+  {
+    id: 'ex516', num: 'Ex 5.16', title: 'Expected Value of a Function (Covariance Setup)',
+    question: `Using the joint distribution from Example 5.1, compute E[(X−μ_X)(Y−μ_Y)] given μ_X = 2.35 and μ_Y = 2.49.
+    <br><br>This is the definition of covariance: Cov(X,Y) = Σ_x Σ_y (x−μ_X)(y−μ_Y) · f(x,y)`,
+    steps: [
+      {
+        q: 'What is the formula used to compute E[g(X,Y)] for a function g of two variables?',
+        opts: [
+          'E[g] = g(μ_X, μ_Y)',
+          'E[g] = Σ_x Σ_y g(x,y) · f(x,y)',
+          'E[g] = Σ_x g(x) · P(X=x)',
+          'E[g] = E(X) · E(Y)'
+        ],
+        correct: 1,
+        fb_correct: '✓ E[g(X,Y)] = Σ_x Σ_y g(x,y) · f(x,y) — sum g times the joint probability over all pairs.',
+        fb_wrong: 'E[g(X,Y)] = Σ_x Σ_y g(x,y) · f(x,y). You must weight each value of g by its joint probability.'
+      },
+      {
+        q: 'For each cell (x,y) in the table, you compute (x − 2.35)(y − 2.49) × f(x,y) and sum all 16 values. What is E[(X−μ_X)(Y−μ_Y)]?',
+        opts: ['−0.5815', '+0.5815', '0', '−1.1630'],
+        correct: 0,
+        fb_correct: '✓ E[(X−μ_X)(Y−μ_Y)] = −0.5815. This is the covariance Cov(X,Y).',
+        fb_wrong: 'Summing (x−2.35)(y−2.49)·f(x,y) over all 16 cells gives −0.5815.'
+      },
+      {
+        q: 'Since the covariance is negative (−0.5815), what does this tell us?',
+        opts: [
+          'X and Y are independent',
+          'As X increases, Y tends to increase',
+          'As X increases, Y tends to decrease',
+          'There is no relationship between X and Y'
+        ],
+        correct: 2,
+        fb_correct: '✓ Negative covariance indicates an inverse linear relationship: when X is large, Y tends to be small.',
+        fb_wrong: 'Negative covariance means an inverse relationship — as X goes up, Y tends to go down.'
+      }
+    ],
+    solution: `<h4>Full Solution</h4>
+<p>Apply the formula: \\( E[(X-\\mu_X)(Y-\\mu_Y)] = \\sum_x \\sum_y (x-\\mu_X)(y-\\mu_Y) \\cdot f(x,y) \\)</p>
+<p style="margin-top:10px">For each of the 16 cells in the joint table, compute \\((x-2.35)(y-2.49) \\times f(x,y)\\) and sum all results.</p>
+<p style="margin-top:10px"><strong>Result: Cov(X,Y) = −0.5815</strong></p>
+<p style="margin-top:10px">Interpretation: The negative value indicates that higher signal bars (X) tend to correspond to shorter response times (Y) — an inverse relationship.</p>`
+  },
+  {
+    id: 'ex517', num: 'Ex 5.17', title: 'Interpreting Covariance',
+    question: 'The covariance from Example 5.16 is Cov(X,Y) = −0.5815. Interpret this result.',
+    steps: [
+      {
+        q: 'A negative covariance means:',
+        opts: [
+          'X and Y are independent',
+          'X and Y have no relationship',
+          'As X increases, Y tends to decrease (inverse relationship)',
+          'As X increases, Y also increases'
+        ],
+        correct: 2,
+        fb_correct: '✓ Correct! Negative covariance indicates an inverse linear tendency between X and Y.',
+        fb_wrong: 'Negative covariance → inverse relationship: when X is high, Y tends to be low.'
+      },
+      {
+        q: 'What is a limitation of using covariance to measure the relationship between X and Y?',
+        opts: [
+          'Covariance can only be negative',
+          'Covariance depends on the units/scale of X and Y, making it hard to compare across problems',
+          'Covariance cannot detect any relationship',
+          'Covariance is always between −1 and +1'
+        ],
+        correct: 1,
+        fb_correct: '✓ Covariance is scale-dependent. A value of −0.5815 is hard to interpret without context — that is why we use correlation instead.',
+        fb_wrong: 'Covariance depends on the scale/units of X and Y. The correlation coefficient standardizes this to [−1, +1].'
+      }
+    ],
+    solution: `<h4>Full Solution</h4>
+<p><strong>Covariance = −0.5815 (negative)</strong></p>
+<p style="margin-top:8px">Interpretation: As X (signal bars) increases, Y (response time) tends to <strong>decrease</strong>. This makes intuitive sense — better signal means faster response.</p>
+<p style="margin-top:10px">Limitation: Covariance is not standardized. Its magnitude depends on the units of X and Y. To compare relationships across different problems, we use the <strong>correlation coefficient ρ</strong>, which is always in [−1, +1].</p>`
+  },
+  {
+    id: 'ex518', num: 'Ex 5.18', title: 'Correlation Coefficient',
+    question: 'Given: Cov(X,Y) = −0.5815, Var(X) = 0.6275, Var(Y) = 1.4099. Find the correlation coefficient ρ.',
+    steps: [
+      {
+        q: 'What is the formula for ρ?',
+        opts: [
+          'ρ = Cov(X,Y) / [Var(X) + Var(Y)]',
+          'ρ = Cov(X,Y) / [√Var(X) × √Var(Y)]',
+          'ρ = Cov(X,Y) × Var(X) × Var(Y)',
+          'ρ = E(XY) − E(X)E(Y)'
+        ],
+        correct: 1,
+        fb_correct: '✓ ρ = Cov(X,Y) / (σ_X · σ_Y) where σ = √Var.',
+        fb_wrong: 'ρ = Cov(X,Y) / (σ_X · σ_Y) where σ_X = √Var(X) and σ_Y = √Var(Y).'
+      },
+      {
+        q: 'What is σ_X × σ_Y?',
+        opts: ['0.6275 × 1.4099 ≈ 0.885', '√0.6275 × √1.4099 ≈ 0.9405', '0.6275 + 1.4099 ≈ 2.037', '√(0.6275 + 1.4099) ≈ 1.428'],
+        correct: 1,
+        fb_correct: '✓ σ_X = √0.6275 ≈ 0.7922, σ_Y = √1.4099 ≈ 1.1874, product ≈ 0.9405',
+        fb_wrong: 'σ_X = √0.6275 ≈ 0.7922 and σ_Y = √1.4099 ≈ 1.1874, so σ_X × σ_Y ≈ 0.9405'
+      },
+      {
+        q: 'Therefore ρ = −0.5815 / 0.9405 ≈',
+        opts: ['−0.618', '+0.618', '−1.0', '−0.285'],
+        correct: 0,
+        fb_correct: '✓ ρ ≈ −0.618 — moderate negative linear relationship.',
+        fb_wrong: 'ρ = −0.5815 / 0.9405 ≈ −0.618'
+      }
+    ],
+    solution: `<h4>Full Solution</h4>
+<p>\\( \\rho = \\dfrac{Cov(X,Y)}{\\sigma_X \\cdot \\sigma_Y} = \\dfrac{-0.5815}{\\sqrt{0.6275} \\times \\sqrt{1.4099}} \\)</p>
+<p>\\( = \\dfrac{-0.5815}{0.7922 \\times 1.1874} = \\dfrac{-0.5815}{0.9405} \\approx \\mathbf{-0.618} \\)</p>
+<p style="margin-top:10px">Interpretation: moderate negative linear relationship — as X increases, Y tends to decrease.</p>`
+  },
+  {
+    id: 'ex519', num: 'Ex 5.19', title: 'Perfect Correlation — Linear Relationship',
+    question: `Let X have the distribution: P(X=1)=0.2, P(X=2)=0.6, P(X=3)=0.2.
+    Let Y = 2X + 5. Find the correlation between X and Y.`,
+    steps: [
+      {
+        q: 'Since Y = 2X + 5, what type of relationship exists between X and Y?',
+        opts: [
+          'No relationship',
+          'A perfect linear relationship (Y = aX + b form)',
+          'A quadratic relationship',
+          'An independent relationship'
+        ],
+        correct: 1,
+        fb_correct: '✓ Y = 2X + 5 is exactly of the form Y = aX + b, which is a perfect linear relationship.',
+        fb_wrong: 'Y = 2X + 5 has the form Y = aX + b (a=2, b=5) — this is a perfect linear function.'
+      },
+      {
+        q: 'When Y = aX + b with a > 0, what is the correlation ρ?',
+        opts: ['ρ = 0', 'ρ = −1', 'ρ = +1', 'ρ = 0.5'],
+        correct: 2,
+        fb_correct: '✓ When Y is a perfect positive linear function of X (a > 0), ρ = +1 exactly.',
+        fb_wrong: 'For Y = aX + b with a > 0: ρ = +1. With a < 0: ρ = −1. Perfect linearity → |ρ| = 1.'
+      }
+    ],
+    solution: `<h4>Full Solution</h4>
+<p>Since \\( Y = 2X + 5 \\) is of the form \\( Y = aX + b \\) with \\( a = 2 > 0 \\):</p>
+<p style="margin-top:10px">This is a <strong>perfect positive linear relationship</strong>, therefore:</p>
+<p>\\( \\rho = +1 \\)</p>
+<p style="margin-top:10px">Key rule: If \\( Y = aX + b \\), then \\( |\\rho| = 1 \\). The sign of ρ matches the sign of a.</p>`
+  },
+  {
+    id: 'ex526', num: 'Ex 5.26', title: 'Error Propagation — Variance of Sum',
+    question: `A product is assembled from 3 independent layers. The thickness variances of each layer are: 25, 40, and 30 nm².
+    Find the total variance of the assembled product.`,
+    steps: [
+      {
+        q: 'Which rule allows us to add variances here?',
+        opts: [
+          'Var(X+Y) = Var(X) + Var(Y), always true',
+          'Var(X+Y) = Var(X) + Var(Y), valid when X and Y are independent',
+          'Var(X+Y) = Var(X) × Var(Y)',
+          'Var(X+Y) = [Var(X) + Var(Y)]²'
+        ],
+        correct: 1,
+        fb_correct: '✓ Var(X+Y) = Var(X) + Var(Y) holds when X and Y are independent. The problem states the layers are independent.',
+        fb_wrong: 'The addition rule Var(X+Y) = Var(X)+Var(Y) requires independence — which is given here.'
+      },
+      {
+        q: 'What is the total variance?',
+        opts: ['25 × 40 × 30 = 30000', '25 + 40 + 30 = 95', '√(25+40+30) ≈ 9.75', '(25+40+30)/3 ≈ 31.7'],
+        correct: 1,
+        fb_correct: '✓ Var(total) = 25 + 40 + 30 = 95 nm²',
+        fb_wrong: 'For independent variables: Var(X₁+X₂+X₃) = Var(X₁)+Var(X₂)+Var(X₃) = 25+40+30 = 95 nm²'
+      }
+    ],
+    solution: `<h4>Full Solution</h4>
+<p>Since the three layers are independent:</p>
+<p>\\( Var(\\text{total}) = Var(X_1) + Var(X_2) + Var(X_3) = 25 + 40 + 30 = \\mathbf{95} \\text{ nm}^2 \\)</p>
+<p style="margin-top:10px">Note: this rule only applies when the variables are <strong>independent</strong>. If they were correlated, covariance terms would need to be included.</p>`
+  },
+  {
+    id: 'ex527', num: 'Ex 5.27', title: 'Linear Function of Normal Variables',
+    question: 'X₁ ~ N(μ=2, σ²=0.1²), X₂ ~ N(μ=5, σ²=0.2²), independent. Perimeter P = 2(X₁ + X₂). Find P(P > 14.5).',
+    steps: [
+      {
+        q: 'What is E(P) = E[2(X₁+X₂)]?',
+        opts: ['2 + 5 = 7', '2(2+5) = 14', '2×2 + 5 = 9', '2×5 = 10'],
+        correct: 1,
+        fb_correct: '✓ E(P) = 2·E(X₁) + 2·E(X₂) = 2(2) + 2(5) = 4 + 10 = 14',
+        fb_wrong: 'E(P) = 2·E(X₁+X₂) = 2(2+5) = 14'
+      },
+      {
+        q: 'What is Var(P) = Var[2(X₁+X₂)]? Note: Var(X₁) = 0.1² = 0.01, Var(X₂) = 0.2² = 0.04',
+        opts: [
+          '4(0.1 + 0.2) = 1.2',
+          '4(0.01 + 0.04) = 0.20',
+          '2²×0.01 only = 0.04',
+          '(0.1 + 0.2)² = 0.09'
+        ],
+        correct: 1,
+        fb_correct: '✓ Var(2(X₁+X₂)) = 4·Var(X₁) + 4·Var(X₂) = 4(0.01) + 4(0.04) = 0.04 + 0.16 = 0.20',
+        fb_wrong: 'Var(2(X₁+X₂)) = 4·Var(X₁) + 4·Var(X₂) = 4(0.01)+4(0.04) = 0.20'
+      },
+      {
+        q: 'Z = (14.5 − 14) / √0.20 ≈',
+        opts: ['Z ≈ 0.447', 'Z ≈ 1.118', 'Z ≈ 0.25', 'Z ≈ 2.5'],
+        correct: 1,
+        fb_correct: '✓ Z = 0.5 / √0.20 = 0.5 / 0.447 ≈ 1.118',
+        fb_wrong: 'Z = (14.5−14) / √0.20 = 0.5 / 1.118 ≈ 0.447'
+      },
+      {
+        q: 'P(P > 14.5) = P(Z > 0.447) = 1 − Φ(0.447) ≈',
+        opts: ['0.6726', '0.3274', '0.1318', '0.8682'],
+        correct: 1,
+        fb_correct: 'Φ(0.456)≈0.6757, so P(P>14.5)≈ 1 − 0.6757=0.3243.',
+        fb_wrong: 'From the Z-table: Φ(0.447) ≈ 0.8682, therefore P(Z > 0.447) = 1 − 0.8682 = 0.1318.'
+      }
+    ],
+    solution: `<h4>Full Solution</h4>
+<p>\\( E(P) = 2(E(X_1) + E(X_2)) = 2(2+5) = \\mathbf{14} \\)</p>
+<p>\\( Var(P) = 4(Var(X_1) + Var(X_2)) = 4(0.01 + 0.04) = \\mathbf{0.20} \\), so \\( \\sigma_P = \\sqrt{0.20} \\approx 1.118 \\)</p>
+<p style="margin-top:10px">Standardize: \\( Z = \\dfrac{14.5 - 14}{1.118} = \\dfrac{0.5}{1.118} \\approx 0.447 \\)</p>
+<p>\\( P(P > 14.5) = 1 - \\Phi(0.447) \\approx 1 - 0.8682 = \\mathbf{0.1318} \\)</p>`
+  }
+];
+
+// ===================== MOCK TEST DATA =====================
+const mockQuestions = [
+  // SECTION A — MCQ (Calculation-Based)
+  { id:'m1', section:'A', type:'mcq',
+    text: 'Using the joint table below, find P(Y=2).<br><br><table class="prob-table" style="width:auto;display:inline-table"><thead><tr><th>X \\ Y</th><th>Y=1</th><th>Y=2</th></tr></thead><tbody><tr><td>X=1</td><td>0.2</td><td>0.3</td></tr><tr><td>X=2</td><td>0.1</td><td>0.4</td></tr></tbody></table>',
+    opts: ['0.3','0.4','0.7','1'],
+    correct: 2,
+    explanation: 'P(Y=2) = 0.3 + 0.4 = 0.7 — sum down the Y=2 column (marginal of Y).'
+  },
+  { id:'m2', section:'A', type:'mcq',
+    text: 'Using the same table (X=1,Y=1:0.2 | X=1,Y=2:0.3 | X=2,Y=1:0.1 | X=2,Y=2:0.4), find P(X=1 | Y=2).',
+    opts: ['0.3','0.429','0.5','0.75'],
+    correct: 1,
+    explanation: 'P(X=1|Y=2) = P(X=1,Y=2)/P(Y=2) = 0.3/0.7 ≈ 0.429'
+  },
+  { id:'m3', section:'A', type:'mcq',
+    text: 'Using the same table (X=1,Y=1:0.2 | X=1,Y=2:0.3 | X=2,Y=1:0.1 | X=2,Y=2:0.4), find P(X=2, Y=1).',
+    opts: ['0.1','0.2','0.3','0.4'],
+    correct: 0,
+    explanation: 'P(X=2, Y=1) = 0.1 — read directly from the joint table.'
+  },
+  { id:'m4', section:'A', type:'mcq',
+    text: 'If P(X=1) = 0.5, P(Y=2) = 0.4, and X, Y are independent, find P(X=1, Y=2).',
+    opts: ['0.9','0.2','0.1','0.5'],
+    correct: 1,
+    explanation: 'By independence: P(X=1, Y=2) = P(X=1) × P(Y=2) = 0.5 × 0.4 = 0.2'
+  },
+  // SECTION B — Solve (Core Problems)
+  { id:'m5', section:'B', type:'mcq',
+    text: 'Using the joint table below, find P(X=2).<br><br><table class="prob-table" style="width:auto;display:inline-table"><thead><tr><th>X \\ Y</th><th>Y=1</th><th>Y=2</th><th>Y=3</th></tr></thead><tbody><tr><td>X=1</td><td>0.1</td><td>0.2</td><td>0.1</td></tr><tr><td>X=2</td><td>0.2</td><td>0.1</td><td>0.3</td></tr></tbody></table>',
+    opts: ['0.3','0.4','0.6','0.7'],
+    correct: 2,
+    explanation: 'P(X=2) = 0.2 + 0.1 + 0.3 = 0.6 — sum all values in row X=2.'
+  },
+  { id:'m6', section:'B', type:'mcq',
+    text: 'Using the same table (X=1: 0.1,0.2,0.1 | X=2: 0.2,0.1,0.3), find P(Y=1).',
+    opts: ['0.1','0.2','0.3','0.4'],
+    correct: 2,
+    explanation: 'P(Y=1) = P(X=1,Y=1) + P(X=2,Y=1) = 0.1 + 0.2 = 0.3 — sum down column Y=1.'
+  },
+  { id:'m7', section:'B', type:'mcq',
+    text: 'Using the same table (X=1: 0.1,0.2,0.1 | X=2: 0.2,0.1,0.3), find P(X=1 | Y=2).',
+    opts: ['0.2','0.333','0.5','0.667'],
+    correct: 3,
+    explanation: 'P(X=1|Y=2) = P(X=1,Y=2)/P(Y=2) = 0.2/(0.2+0.1) = 0.2/0.3 ≈ 0.667'
+  },
+  { id:'m8', section:'B', type:'mcq',
+    text: 'Using the same table (X=1: 0.1,0.2,0.1 | X=2: 0.2,0.1,0.3), find P(X≤1, Y≥2).',
+    opts: ['0.1','0.2','0.3','0.4'],
+    correct: 2,
+    explanation: 'P(X≤1, Y≥2) = P(X=1,Y=2) + P(X=1,Y=3) = 0.2 + 0.1 = 0.3'
+  },
+  { id:'m9', section:'B', type:'mcq',
+    text: 'Given the table below, find E(Y | X=1).<br><br><table class="prob-table" style="width:auto;display:inline-table"><thead><tr><th>X \\ Y</th><th>Y=1</th><th>Y=2</th></tr></thead><tbody><tr><td>X=1</td><td>0.3</td><td>0.2</td></tr><tr><td>X=2</td><td>0.1</td><td>0.4</td></tr></tbody></table><br>First: P(X=1)=0.5, so P(Y=1|X=1)=0.6, P(Y=2|X=1)=0.4',
+    opts: ['1.2','1.4','1.5','1.6'],
+    correct: 1,
+    explanation: 'E(Y|X=1) = 1×P(Y=1|X=1) + 2×P(Y=2|X=1) = 1(0.6) + 2(0.4) = 0.6 + 0.8 = 1.4'
+  },
+  // SECTION C — Calculation
+  { id:'m10', section:'C', type:'calc',
+    text: 'Using the joint table (X=1,Y=1:0.25 | X=1,Y=2:0.25 | X=2,Y=1:0.25 | X=2,Y=2:0.25), find E(XY). [Hint: E(XY) = Σ_x Σ_y xy·p(x,y)]',
+    answer: '2.25',
+    tolerance: 0.01,
+    explanation: 'E(XY) = (1)(1)(0.25)+(1)(2)(0.25)+(2)(1)(0.25)+(2)(2)(0.25) = 0.25+0.5+0.5+1 = 2.25'
+  },
+  { id:'m11', section:'C', type:'calc',
+    text: 'Using the same symmetric table (all cells = 0.25 for X,Y ∈ {1,2}): E(X)=1.5, E(Y)=1.5, E(XY)=2.25. Find Cov(X,Y). [Formula: Cov = E(XY) − E(X)E(Y)]',
+    answer: '0',
+    tolerance: 0.01,
+    explanation: 'Cov(X,Y) = E(XY) − E(X)E(Y) = 2.25 − (1.5)(1.5) = 2.25 − 2.25 = 0'
+  },
+  { id:'m12', section:'C', type:'calc',
+    text: 'Joint table: X=1,Y=1:0.2 | X=1,Y=2:0.3 | X=2,Y=1:0.3 | X=2,Y=2:0.2. Check independence: what is P(X=1)×P(Y=1)?<br>[Compute: P(X=1)=0.5, P(Y=1)=0.5]',
+    answer: '0.25',
+    tolerance: 0.01,
+    explanation: 'P(X=1)×P(Y=1) = 0.5×0.5 = 0.25. But P(X=1,Y=1)=0.20 ≠ 0.25 → NOT independent.'
+  }
+];
+
+// ===================== CHEAT SHEET DATA =====================
+const cheatFormulas = [
+  { title: 'Joint PMF Conditions', formula: 'p(x,y) ≥ 0\nΣ_x Σ_y p(x,y) = 1', note: 'Double sum = 1 is the most common exam check.' },
+  { title: 'Marginal of X', formula: 'P(X=x) = Σ_y P(X=x, Y=y)', note: 'Sum across each row of the joint table.' },
+  { title: 'Marginal of Y', formula: 'P(Y=y) = Σ_x P(X=x, Y=y)', note: 'Sum down each column of the joint table.' },
+  { title: 'Conditional Probability', formula: 'P(Y=y | X=x) = P(X=x,Y=y) / P(X=x)', note: 'Divide joint by the marginal of the conditioning variable.' },
+  { title: 'Independence Test', formula: 'P(X=x, Y=y) = P(X=x) · P(Y=y)\nfor ALL pairs (x,y)', note: 'One failure → not independent.' },
+  { title: 'Expected Value', formula: 'E(X) = Σ_x Σ_y x · p(x,y)\nE[g(X,Y)] = Σ_x Σ_y g(x,y)·p(x,y)', note: 'Use joint table for all expectation calculations.' },
+  { title: 'Covariance', formula: 'Cov(X,Y) = E(XY) − E(X)E(Y)', note: 'Compute E(XY) = Σ_x Σ_y xy·p(x,y) first.' },
+  { title: 'Correlation', formula: 'ρ = Cov(X,Y) / (σ_X · σ_Y)\n−1 ≤ ρ ≤ 1', note: 'If Y = aX+b (linear), then |ρ| = 1.' },
+  { title: 'Variance Rules', formula: 'E(X+Y) = E(X)+E(Y)  [always]\nVar(X+Y) = Var(X)+Var(Y)  [if independent]', note: 'Var rule is the most commonly misapplied formula.' },
+  { title: 'Binomial', formula: 'P(X=x) = C(n,x)·pˣ·(1−p)^(n−x)', note: 'Fixed n, two outcomes, constant p, independent.' },
+  { title: 'Poisson', formula: 'P(X=x) = e^(−λ)·λˣ / x!', note: 'Count events in fixed interval. E(X)=Var(X)=λ.' },
+  { title: 'Linear Normal', formula: 'If X~N(μ,σ²), then aX+b ~ N(aμ+b, a²σ²)', note: 'Sum of independent normals is also normal.' },
+];
+
+const traps = [
+  { label: 'Variance Trap', text: 'Var(X+Y) = Var(X)+Var(Y) is ONLY valid when X and Y are independent.' },
+  { label: 'Independence Test', text: 'Must check ALL pairs, not just one. A single failure means dependent.' },
+  { label: 'Double Sum', text: 'Forgetting to sum over all values in Σ_x Σ_y — always verify the total equals 1.' },
+  { label: 'Wrong Denominator', text: 'In P(Y|X=x), always divide by P(X=x) — not P(Y=y) or the joint value.' },
+  { label: 'Cov = 0 ≠ Independent', text: 'Zero covariance does NOT mean independence. It only means no LINEAR relationship.' },
+  { label: 'Correlation > 1?', text: 'Impossible. |ρ| ≤ 1 always. If you get >1, recheck your standard deviations.' },
+];
+
+// ===================== RENDER SUMMARY =====================
+function renderSummary() {
+  const grid = document.getElementById('concepts-grid');
+  grid.innerHTML = concepts.map((c, i) => `
+    <div class="concept-card">
+      <div class="concept-header" onclick="toggleConcept(${i})" id="ch-${i}">
+        <div class="concept-title-wrap">
+          <div class="concept-num">${c.num}</div>
+          <span class="concept-title">${c.title}</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px">
+          <span class="concept-badge ${c.importance === 'HIGHLY TESTED' || c.importance === 'EXAM TRAP' ? 'high' : ''}">${c.importance}</span>
+          <span class="concept-chevron">▾</span>
+        </div>
+      </div>
+      <div class="concept-body" id="cb-${i}">${c.body}</div>
+    </div>
+  `).join('');
+  // Open first
+  toggleConcept(0);
+}
+
+function toggleConcept(i) {
+  const hdr = document.getElementById('ch-'+i);
+  const body = document.getElementById('cb-'+i);
+  const isOpen = body.classList.contains('open');
+  body.classList.toggle('open', !isOpen);
+  hdr.classList.toggle('open', !isOpen);
+}
+
+// ===================== RENDER EXAMPLES =====================
+function renderExamples() {
+  const cont = document.getElementById('examples-container');
+  cont.innerHTML = examples.map(ex => {
+    const tableHTML = ex.table ? `
+      <table class="prob-table">
+        <thead><tr>${ex.table.headers.map(h=>`<th>${h}</th>`).join('')}</tr></thead>
+        <tbody>${ex.table.rows.map(r=>`<tr>${r.map(c=>`<td>${c}</td>`).join('')}</tr>`).join('')}</tbody>
+      </table>` : '';
+
+    const stepsHTML = ex.steps.map((s, si) => `
+      <div class="step" id="step-${ex.id}-${si}">
+        <div class="step-question">Step ${si+1}: ${s.q}</div>
+        <div class="step-options">
+          ${s.opts.map((o,oi) => `
+            <button class="step-option" onclick="checkStep('${ex.id}',${si},${oi},${s.correct})">${o}</button>
+          `).join('')}
+        </div>
+        <div class="step-feedback" id="sfb-${ex.id}-${si}"></div>
+      </div>
+    `).join('');
+
+    return `
+      <div class="example-card">
+        <div class="example-header">
+          <span class="ex-num">${ex.num}</span>
+          <h3>${ex.title}</h3>
+        </div>
+        <div class="example-body">
+          <p>${ex.question}</p>
+          ${tableHTML}
+          <div class="steps-container">${stepsHTML}</div>
+          <button class="show-solution-btn" onclick="toggleSolution('${ex.id}')">Show Full Solution ▾</button>
+          <div class="full-solution" id="sol-${ex.id}">${ex.solution}</div>
+        </div>
+      </div>
+    `;
+  }).join('');
+
+  if (window.MathJax) MathJax.typesetPromise();
+}
+
+function checkStep(exId, stepIdx, chosen, correct) {
+  const stepEl = document.getElementById(`step-${exId}-${stepIdx}`);
+  const fbEl = document.getElementById(`sfb-${exId}-${stepIdx}`);
+  const ex = examples.find(e=>e.id===exId);
+  const step = ex.steps[stepIdx];
+  const btns = stepEl.querySelectorAll('.step-option');
+
+  btns.forEach(b => b.disabled = true);
+
+  const isCorrect = chosen === correct;
+  btns[chosen].classList.add(isCorrect ? 'selected-correct' : 'selected-wrong');
+  if (!isCorrect) btns[correct].classList.add('reveal-correct');
+
+  fbEl.textContent = isCorrect ? step.fb_correct : '✗ ' + step.fb_wrong;
+  fbEl.className = `step-feedback show ${isCorrect ? 'correct-fb' : 'wrong-fb'}`;
+  stepEl.classList.add(isCorrect ? 'correct' : 'wrong');
+}
+
+function toggleSolution(exId) {
+  const sol = document.getElementById('sol-'+exId);
+  sol.classList.toggle('show');
+  if (window.MathJax) MathJax.typesetPromise();
+}
+
+// ===================== RENDER MOCK =====================
+let mockAnswers = {};
+let timerInterval = null;
+let timeLeft = 20 * 60;
+let mockSubmitted = false;
+
+function renderMock() {
+  const cont = document.getElementById('mock-container');
+  const sections = { A: [], B: [], C: [] };
+  mockQuestions.forEach(q => sections[q.section].push(q));
+
+  let html = '';
+  for (const [sec, qs] of Object.entries(sections)) {
+    const labels = { A:'Section A — MCQs (Calculation-Based)', B:'Section B — Solve (Core Problems)', C:'Section C — Calculation' };
+    html += `<div class="mock-section-title">${labels[sec]}</div>`;
+    qs.forEach((q, idx) => {
+      const globalIdx = mockQuestions.indexOf(q) + 1;
+      const noteHTML = q.tableNote ? `<div style="background:var(--ice);border-radius:8px;padding:10px 14px;font-size:0.82rem;color:var(--navy);margin-bottom:12px;font-weight:500;">${q.tableNote}</div>` : '';
+
+      if (q.type === 'mcq') {
+        html += `
+          <div class="mock-q" id="mq-${q.id}">
+            <div class="mock-q-num">Q${globalIdx}</div>
+            <div class="mock-q-text">${q.text}</div>
+            ${noteHTML}
+            <div class="mock-opts">
+              ${q.opts.map((o,oi)=>`
+                <div class="mock-opt" id="mopt-${q.id}-${oi}" onclick="selectMockOpt('${q.id}',${oi})">
+                  <div class="opt-letter">${['A','B','C','D'][oi]}</div>
+                  <span>${o}</span>
+                </div>
+              `).join('')}
+            </div>
+            <div class="mock-q-feedback" id="mfb-${q.id}"></div>
+          </div>`;
+      } else {
+        html += `
+          <div class="mock-q" id="mq-${q.id}">
+            <div class="mock-q-num">Q${globalIdx}</div>
+            <div class="mock-q-text">${q.text}</div>
+            <div class="calc-input-wrap">
+              <input type="number" step="any" class="calc-input" id="calc-${q.id}" placeholder="Your answer">
+              <button class="calc-btn" onclick="checkCalc('${q.id}')">Check</button>
+            </div>
+            <div class="mock-q-feedback" id="mfb-${q.id}"></div>
+          </div>`;
+      }
+    });
+  }
+  cont.innerHTML = html;
+  updateMockProgress();
+}
+
+function selectMockOpt(qId, chosen) {
+  if (mockSubmitted) return;
+  const q = mockQuestions.find(q=>q.id===qId);
+  const opts = document.querySelectorAll(`[id^="mopt-${qId}-"]`);
+  opts.forEach(o => o.classList.remove('selected'));
+  opts[chosen].classList.add('selected');
+  mockAnswers[qId] = chosen;
+  updateMockProgress();
+}
+
+function checkCalc(qId) {
+  if (mockSubmitted) return;
+  const val = parseFloat(document.getElementById('calc-'+qId).value);
+  mockAnswers[qId] = val;
+  updateMockProgress();
+}
+
+function updateMockProgress() {
+  const answered = Object.keys(mockAnswers).length;
+  document.getElementById('mock-progress').style.width = (answered/mockQuestions.length*100)+'%';
+}
+
+function submitMock() {
+  if (mockSubmitted) return;
+  mockSubmitted = true;
+  clearInterval(timerInterval);
+  document.getElementById('submit-btn').disabled = true;
+
+  let totalScore = 0;
+  let mcqScore = 0;
+  let calcScore = 0;
+
+  mockQuestions.forEach(q => {
+    const qEl = document.getElementById('mq-'+q.id);
+    const fbEl = document.getElementById('mfb-'+q.id);
+
+    if (q.type === 'mcq') {
+      const chosen = mockAnswers[q.id];
+      const correct = q.correct;
+      const opts = document.querySelectorAll(`[id^="mopt-${q.id}-"]`);
+      opts.forEach(o => { o.classList.add('disabled'); o.style.pointerEvents='none'; });
+
+      if (chosen !== undefined) {
+        const isCorrect = chosen === correct;
+        if (isCorrect) { totalScore++; mcqScore++; }
+        opts[chosen].classList.remove('selected');
+        opts[chosen].classList.add(isCorrect ? 'correct-ans' : 'wrong-ans');
+        opts[correct].classList.add('correct-ans');
+        qEl.classList.add(isCorrect ? 'answered-correct' : 'answered-wrong');
+        fbEl.textContent = (isCorrect ? '✓ Correct! ' : '✗ Incorrect. ') + q.explanation;
+        fbEl.className = `mock-q-feedback show ${isCorrect ? 'fb-correct' : 'fb-wrong'}`;
+      } else {
+        opts[correct].classList.add('correct-ans');
+        qEl.classList.add('answered-wrong');
+        fbEl.textContent = '— Not answered. Correct: ' + q.opts[correct] + '. ' + q.explanation;
+        fbEl.className = 'mock-q-feedback show fb-wrong';
+      }
+    } else {
+      // calc
+      const val = mockAnswers[q.id];
+      const expected = parseFloat(q.answer);
+      const isCorrect = val !== undefined && !isNaN(val) && Math.abs(val - expected) <= q.tolerance;
+      if (isCorrect) { totalScore++; calcScore++; }
+      const inp = document.getElementById('calc-'+q.id);
+      inp.disabled = true;
+      inp.style.borderColor = isCorrect ? 'var(--green)' : 'var(--red)';
+      qEl.classList.add(isCorrect ? 'answered-correct' : 'answered-wrong');
+      fbEl.textContent = (isCorrect ? '✓ Correct! ' : `✗ Expected ≈ ${q.answer}. `) + q.explanation;
+      fbEl.className = `mock-q-feedback show ${isCorrect ? 'fb-correct' : 'fb-wrong'}`;
+    }
+  });
+
+  const total = mockQuestions.length;
+  document.getElementById('results-score').textContent = `${totalScore}/${total}`;
+  document.getElementById('res-mcq').textContent = `${mcqScore}/9`;
+  document.getElementById('res-calc').textContent = `${calcScore}/3`;
+  document.getElementById('res-pct').textContent = `${Math.round(totalScore/total*100)}%`;
+  document.getElementById('results-panel').classList.add('show');
+  document.getElementById('results-panel').scrollIntoView({behavior:'smooth', block:'center'});
+}
+
+function resetMock() {
+  mockAnswers = {};
+  mockSubmitted = false;
+  timeLeft = 20 * 60;
+  document.getElementById('submit-btn').disabled = false;
+  document.getElementById('results-panel').classList.remove('show');
+  renderMock();
+  startTimer();
+}
+
+function startTimer() {
+  clearInterval(timerInterval);
+  timerInterval = setInterval(() => {
+    timeLeft--;
+    const m = Math.floor(timeLeft/60).toString().padStart(2,'0');
+    const s = (timeLeft%60).toString().padStart(2,'0');
+    document.getElementById('timer-display').textContent = `${m}:${s}`;
+    if (timeLeft <= 0) { clearInterval(timerInterval); submitMock(); }
+    if (timeLeft <= 300) document.getElementById('timer-display').style.color = '#ef4444';
+  }, 1000);
+}
+
+// ===================== RENDER CHEAT SHEET =====================
+function renderCheatSheet() {
+  document.getElementById('cheat-grid').innerHTML = cheatFormulas.map(f => `
+    <div class="cheat-card">
+      <h4>${f.title}</h4>
+      <div class="formula">${f.formula.replace(/\n/g,'<br>')}</div>
+      <div class="note">💡 ${f.note}</div>
+    </div>
+  `).join('');
+
+  document.getElementById('trap-list').innerHTML = traps.map(t => `
+    <li><strong>⚠️ ${t.label}</strong>${t.text}</li>
+  `).join('');
+}
+
+// ===================== TAB SWITCHING =====================
+function switchTab(name) {
+  document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(el => el.classList.remove('active'));
+  document.getElementById('tab-'+name).classList.add('active');
+  const tabs = ['summary','examples','mock','cheatsheet'];
+  document.querySelectorAll('.nav-tab')[tabs.indexOf(name)].classList.add('active');
+
+  if (name === 'mock' && !timerInterval) startTimer();
+  if (window.MathJax) MathJax.typesetPromise();
+}
+
+// ===================== INIT =====================
+renderSummary();
+renderExamples();
+renderMock();
+renderCheatSheet();
+if (window.MathJax) MathJax.typesetPromise();
+</script>
+</body>
+</html>
