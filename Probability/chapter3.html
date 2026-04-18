@@ -1,0 +1,1448 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-TP9KT7RKVV"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-TP9KT7RKVV');
+</script>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Chapter 3 — Discrete Random Variables & Distributions</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-chtml.min.js" crossorigin="anonymous"></script>
+<style>
+  :root {
+    --gold: #F2B418;
+    --ice: #ECF8FD;
+    --steel: #AFCBD5;
+    --navy: #272838;
+    --clay: #815355;
+    --white: #FFFFFF;
+    --text: #1a1a2e;
+    --muted: #6b7280;
+    --green: #16a34a;
+    --green-bg: #dcfce7;
+    --red: #dc2626;
+    --red-bg: #fee2e2;
+    --yellow-bg: #fef9c3;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--ice);
+    color: var(--text);
+  }
+
+  /* NAV */
+  nav {
+    position: sticky; top: 0; z-index: 100;
+    background: var(--navy);
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 14px 32px;
+    box-shadow: 0 2px 16px rgba(39,40,56,0.25);
+  }
+  .nav-left { display: flex; align-items: center; gap: 16px; }
+  .nav-back {
+    color: var(--steel); text-decoration: none; font-size: 0.85rem;
+    display: flex; align-items: center; gap: 6px;
+    transition: color 0.2s;
+  }
+  .nav-back:hover { color: var(--gold); }
+  .nav-title { color: var(--white); font-weight: 600; font-size: 0.95rem; }
+  .nav-tabs { display: flex; gap: 4px; }
+  .nav-tab {
+    background: transparent; border: none; cursor: pointer;
+    color: var(--steel); font-size: 0.82rem; font-family: 'DM Sans', sans-serif;
+    padding: 7px 14px; border-radius: 20px; transition: all 0.2s;
+  }
+  .nav-tab:hover { background: rgba(255,255,255,0.08); color: var(--white); }
+  .nav-tab.active { background: var(--gold); color: var(--navy); font-weight: 600; }
+
+  /* HERO */
+  .hero {
+    background: linear-gradient(135deg, var(--navy) 0%, #1e2035 100%);
+    padding: 56px 32px 48px;
+    position: relative; overflow: hidden;
+  }
+  .hero::before {
+    content: '3'; position: absolute; right: 40px; top: 50%;
+    transform: translateY(-50%);
+    font-family: 'Playfair Display', serif;
+    font-size: 200px; color: rgba(255,255,255,0.04);
+    line-height: 1; user-select: none;
+  }
+  .hero-inner { max-width: 900px; margin: 0 auto; position: relative; z-index: 1; }
+  .hero-tag {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: rgba(242,180,24,0.15); border: 1px solid rgba(242,180,24,0.3);
+    color: var(--gold); font-size: 11px; font-weight: 700;
+    letter-spacing: 2px; text-transform: uppercase;
+    padding: 5px 14px; border-radius: 20px; margin-bottom: 20px;
+  }
+  .hero h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(1.8rem, 4vw, 2.8rem);
+    color: var(--white); line-height: 1.2; margin-bottom: 14px;
+  }
+  .hero h1 em { color: var(--gold); font-style: normal; }
+  .hero p { color: var(--steel); font-size: 0.97rem; font-weight: 300; line-height: 1.7; max-width: 560px; }
+  .hero-pills { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 24px; }
+  .hero-pill {
+    background: rgba(175,203,213,0.12); border: 1px solid rgba(175,203,213,0.25);
+    color: var(--steel); font-size: 0.78rem; padding: 5px 12px; border-radius: 14px;
+  }
+
+  /* CONTENT */
+  .content { max-width: 900px; margin: 0 auto; padding: 48px 24px; }
+
+  /* TABS CONTENT */
+  .tab-content { display: none; }
+  .tab-content.active { display: block; }
+
+  /* SUMMARY SECTIONS */
+  .summary-grid { display: grid; gap: 16px; }
+
+  .concept-card {
+    background: var(--white);
+    border-radius: 14px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(39,40,56,0.06);
+  }
+  .concept-header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 18px 24px;
+    cursor: pointer;
+    border-bottom: 1px solid transparent;
+    transition: background 0.2s;
+    user-select: none;
+  }
+  .concept-header:hover { background: var(--ice); }
+  .concept-header.open { border-bottom-color: rgba(175,203,213,0.3); }
+  .concept-title-wrap { display: flex; align-items: center; gap: 14px; }
+  .concept-num {
+    width: 32px; height: 32px; border-radius: 8px;
+    background: var(--gold); color: var(--navy);
+    font-size: 0.8rem; font-weight: 700;
+    display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+  }
+  .concept-title { font-weight: 600; font-size: 0.97rem; color: var(--navy); }
+  .concept-badge {
+    font-size: 10px; font-weight: 700; letter-spacing: 1px;
+    text-transform: uppercase; padding: 3px 8px; border-radius: 10px;
+    background: #fef3c7; color: #92400e;
+  }
+  .concept-badge.high { background: #fee2e2; color: #991b1b; }
+  .concept-chevron { color: var(--muted); transition: transform 0.3s; font-size: 0.9rem; }
+  .concept-header.open .concept-chevron { transform: rotate(180deg); }
+  .concept-body {
+    display: none;
+    padding: 20px 24px 24px;
+  }
+  .concept-body.open { display: block; }
+  .concept-body p { font-size: 0.9rem; line-height: 1.75; color: #374151; margin-bottom: 12px; }
+  .concept-body p:last-child { margin-bottom: 0; }
+
+  .formula-box {
+    background: var(--ice);
+    border-left: 4px solid var(--gold);
+    border-radius: 0 10px 10px 0;
+    padding: 14px 18px;
+    margin: 14px 0;
+    font-size: 0.9rem;
+  }
+  .trap-box {
+    background: #fff7ed;
+    border: 1px solid #fed7aa;
+    border-radius: 10px;
+    padding: 14px 18px;
+    margin-top: 14px;
+    font-size: 0.85rem;
+    color: #7c2d12;
+  }
+  .trap-box strong { display: block; margin-bottom: 4px; color: #c2410c; }
+
+  /* EXAMPLES */
+  .example-card {
+    background: var(--white);
+    border-radius: 16px;
+    overflow: hidden;
+    margin-bottom: 24px;
+    box-shadow: 0 2px 10px rgba(39,40,56,0.07);
+  }
+  .example-header {
+    background: var(--navy);
+    padding: 18px 28px;
+    display: flex; align-items: center; gap: 16px;
+  }
+  .ex-num {
+    background: var(--gold); color: var(--navy);
+    font-weight: 800; font-size: 0.8rem;
+    padding: 4px 10px; border-radius: 8px;
+  }
+  .example-header h3 { color: var(--white); font-size: 1rem; font-weight: 600; }
+  .example-body { padding: 24px 28px; }
+  .example-body p { font-size: 0.9rem; line-height: 1.7; color: #374151; margin-bottom: 12px; }
+
+  .prob-table {
+    width: 100%; border-collapse: collapse;
+    margin: 16px 0; font-size: 0.85rem;
+    border-radius: 10px; overflow: hidden;
+  }
+  .prob-table th {
+    background: var(--navy); color: var(--white);
+    padding: 10px 14px; text-align: center; font-weight: 600;
+  }
+  .prob-table td {
+    padding: 9px 14px; text-align: center;
+    border-bottom: 1px solid rgba(175,203,213,0.3);
+  }
+  .prob-table tr:nth-child(even) td { background: var(--ice); }
+  .prob-table td:first-child { font-weight: 600; color: var(--navy); background: #f8fafc; }
+
+  /* INTERACTIVE STEPS */
+  .steps-container { margin-top: 20px; }
+  .step {
+    border: 2px solid rgba(175,203,213,0.4);
+    border-radius: 12px;
+    padding: 16px 20px;
+    margin-bottom: 14px;
+    transition: border-color 0.3s;
+  }
+  .step.correct { border-color: var(--green); background: var(--green-bg); }
+  .step.wrong { border-color: var(--red); background: var(--red-bg); }
+  .step-question { font-size: 0.88rem; font-weight: 600; color: var(--navy); margin-bottom: 12px; }
+  .step-options { display: flex; flex-wrap: wrap; gap: 8px; }
+  .step-option {
+    background: var(--ice); border: 2px solid rgba(175,203,213,0.5);
+    border-radius: 8px; padding: 8px 16px; font-size: 0.85rem;
+    cursor: pointer; transition: all 0.2s; font-family: 'DM Sans', sans-serif;
+    color: var(--text);
+  }
+  .step-option:hover:not(:disabled) { border-color: var(--gold); background: #fffbeb; }
+  .step-option.selected-correct { background: var(--green-bg); border-color: var(--green); color: var(--green); font-weight: 600; }
+  .step-option.selected-wrong { background: var(--red-bg); border-color: var(--red); color: var(--red); font-weight: 600; }
+  .step-option.reveal-correct { background: var(--green-bg); border-color: var(--green); color: var(--green); }
+  .step-option:disabled { cursor: not-allowed; opacity: 0.7; }
+  .step-feedback {
+    margin-top: 10px; font-size: 0.84rem; line-height: 1.6;
+    display: none; padding: 10px 14px; border-radius: 8px;
+  }
+  .step-feedback.show { display: block; }
+  .step-feedback.correct-fb { background: #f0fdf4; color: #166534; }
+  .step-feedback.wrong-fb { background: #fff1f2; color: #991b1b; }
+
+  .show-solution-btn {
+    display: block; width: 100%; margin-top: 20px;
+    background: var(--navy); color: var(--white);
+    border: none; border-radius: 10px; padding: 12px;
+    font-size: 0.88rem; font-weight: 600; font-family: 'DM Sans', sans-serif;
+    cursor: pointer; transition: background 0.2s;
+  }
+  .show-solution-btn:hover { background: var(--clay); }
+  .full-solution {
+    display: none; margin-top: 16px;
+    background: #f8fafc; border-radius: 10px;
+    padding: 18px 20px; border-left: 4px solid var(--gold);
+  }
+  .full-solution.show { display: block; }
+  .full-solution h4 { font-size: 0.88rem; color: var(--navy); margin-bottom: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; }
+  .full-solution p { font-size: 0.87rem; line-height: 1.75; color: #374151; }
+
+  /* MOCK TEST */
+  .mock-header {
+    background: var(--navy); border-radius: 16px;
+    padding: 28px 32px; margin-bottom: 28px;
+    display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px;
+  }
+  .mock-header h2 { font-family: 'Playfair Display', serif; color: var(--white); font-size: 1.5rem; }
+  .mock-header p { color: var(--steel); font-size: 0.85rem; margin-top: 4px; }
+  .mock-timer {
+    background: rgba(242,180,24,0.15); border: 1px solid var(--gold);
+    border-radius: 10px; padding: 12px 20px; text-align: center;
+  }
+  .mock-timer .timer-val { font-family: 'Playfair Display', serif; font-size: 2rem; color: var(--gold); }
+  .mock-timer .timer-label { font-size: 0.75rem; color: var(--steel); letter-spacing: 1px; }
+
+  .mock-section-title {
+    font-size: 11px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase;
+    color: var(--clay); margin: 32px 0 16px; display: flex; align-items: center; gap: 10px;
+  }
+  .mock-section-title::after { content: ''; flex: 1; height: 1px; background: rgba(175,203,213,0.5); }
+
+  .mock-q {
+    background: var(--white); border-radius: 14px; padding: 22px 26px;
+    margin-bottom: 16px; box-shadow: 0 2px 8px rgba(39,40,56,0.05);
+    border: 2px solid transparent; transition: border-color 0.3s;
+  }
+  .mock-q.answered-correct { border-color: var(--green); }
+  .mock-q.answered-wrong { border-color: var(--red); }
+  .mock-q-num { font-size: 11px; font-weight: 700; color: var(--gold); letter-spacing: 1px; margin-bottom: 8px; }
+  .mock-q-text { font-size: 0.92rem; color: var(--navy); font-weight: 500; line-height: 1.6; margin-bottom: 16px; }
+  .mock-opts { display: flex; flex-direction: column; gap: 8px; }
+  .mock-opt {
+    display: flex; align-items: center; gap: 12px;
+    padding: 11px 16px; border-radius: 10px;
+    border: 1.5px solid rgba(175,203,213,0.4);
+    cursor: pointer; transition: all 0.2s;
+    font-size: 0.88rem; background: var(--ice);
+  }
+  .mock-opt:hover:not(.disabled) { border-color: var(--gold); background: #fffbeb; }
+  .mock-opt.selected { border-color: var(--navy); background: #f0f4ff; font-weight: 500; }
+  .mock-opt.correct-ans { border-color: var(--green); background: var(--green-bg); color: var(--green); font-weight: 600; }
+  .mock-opt.wrong-ans { border-color: var(--red); background: var(--red-bg); color: var(--red); }
+  .mock-opt.disabled { cursor: not-allowed; }
+  .opt-letter {
+    width: 26px; height: 26px; border-radius: 6px;
+    background: rgba(175,203,213,0.3); color: var(--navy);
+    font-weight: 700; font-size: 0.78rem;
+    display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+  }
+  .mock-opt.correct-ans .opt-letter { background: var(--green); color: white; }
+  .mock-opt.wrong-ans .opt-letter { background: var(--red); color: white; }
+  .mock-q-feedback { font-size: 0.82rem; margin-top: 12px; padding: 10px 14px; border-radius: 8px; display: none; }
+  .mock-q-feedback.show { display: block; }
+  .mock-q-feedback.fb-correct { background: #f0fdf4; color: #166534; }
+  .mock-q-feedback.fb-wrong { background: #fff1f2; color: #991b1b; }
+
+  /* Calc question */
+  .calc-input-wrap { display: flex; gap: 10px; align-items: center; margin-top: 12px; flex-wrap: wrap; }
+  .calc-input {
+    padding: 10px 14px; border: 1.5px solid rgba(175,203,213,0.4);
+    border-radius: 10px; font-family: 'DM Sans', sans-serif; font-size: 0.9rem;
+    background: var(--ice); color: var(--text); width: 130px;
+    transition: border-color 0.2s;
+  }
+  .calc-input:focus { outline: none; border-color: var(--gold); }
+  .calc-btn {
+    padding: 10px 20px; background: var(--gold); color: var(--navy);
+    border: none; border-radius: 10px; font-weight: 700; font-size: 0.85rem;
+    cursor: pointer; font-family: 'DM Sans', sans-serif; transition: opacity 0.2s;
+  }
+  .calc-btn:hover { opacity: 0.85; }
+
+  /* RESULTS */
+  .results-panel {
+    display: none; background: var(--navy); border-radius: 16px;
+    padding: 36px; margin-top: 32px; text-align: center;
+  }
+  .results-panel.show { display: block; }
+  .results-score {
+    font-family: 'Playfair Display', serif; font-size: 4rem;
+    color: var(--gold); line-height: 1;
+  }
+  .results-label { color: var(--steel); font-size: 0.9rem; margin-top: 6px; margin-bottom: 24px; }
+  .results-bars { display: flex; gap: 24px; justify-content: center; flex-wrap: wrap; margin-bottom: 24px; }
+  .result-stat { text-align: center; }
+  .result-stat .val { font-size: 1.6rem; font-weight: 700; color: var(--white); }
+  .result-stat .lbl { font-size: 0.78rem; color: var(--steel); margin-top: 2px; }
+  .retry-btn {
+    background: var(--gold); color: var(--navy); border: none;
+    padding: 12px 32px; border-radius: 30px; font-weight: 700;
+    font-size: 0.95rem; cursor: pointer; font-family: 'DM Sans', sans-serif;
+    transition: opacity 0.2s;
+  }
+  .retry-btn:hover { opacity: 0.85; }
+
+  .submit-wrap { margin-top: 32px; text-align: center; }
+  .submit-btn {
+    background: var(--gold); color: var(--navy);
+    border: none; border-radius: 30px; padding: 14px 48px;
+    font-size: 1rem; font-weight: 700; cursor: pointer;
+    font-family: 'DM Sans', sans-serif;
+    box-shadow: 0 4px 16px rgba(242,180,24,0.35);
+    transition: all 0.2s;
+  }
+  .submit-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(242,180,24,0.4); }
+  .submit-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+  /* PROGRESS */
+  .progress-bar-wrap { height: 4px; background: rgba(175,203,213,0.3); border-radius: 2px; margin-bottom: 32px; }
+  .progress-bar { height: 4px; background: var(--gold); border-radius: 2px; transition: width 0.4s; }
+
+  /* CHEAT SHEET */
+  .cheat-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 14px; }
+  .cheat-card {
+    background: var(--white); border-radius: 12px; padding: 20px 22px;
+    border-top: 4px solid var(--gold);
+    box-shadow: 0 2px 8px rgba(39,40,56,0.05);
+  }
+  .cheat-card h4 { font-size: 0.88rem; font-weight: 700; color: var(--navy); margin-bottom: 10px; }
+  .cheat-card .formula { font-size: 0.85rem; color: #374151; line-height: 1.8; }
+  .cheat-card .note { font-size: 0.78rem; color: var(--muted); margin-top: 8px; line-height: 1.6; }
+
+  .trap-list { list-style: none; display: flex; flex-direction: column; gap: 8px; margin-top: 24px; }
+  .trap-list li {
+    background: #fff7ed; border-radius: 10px; padding: 12px 16px;
+    font-size: 0.85rem; color: #7c2d12; border-left: 4px solid #f97316;
+  }
+  .trap-list li strong { display: block; color: #c2410c; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 2px; }
+
+  /* Utility */
+  .section-label {
+    font-size: 11px; font-weight: 700; letter-spacing: 2px;
+    text-transform: uppercase; color: var(--muted); margin-bottom: 20px;
+    display: flex; align-items: center; gap: 10px;
+  }
+  .section-label::after { content: ''; flex: 1; height: 1px; background: rgba(175,203,213,0.4); }
+
+  @media (max-width: 600px) {
+    nav { flex-direction: column; align-items: flex-start; gap: 10px; }
+    .nav-tabs { width: 100%; overflow-x: auto; }
+    .hero { padding: 36px 20px 32px; }
+    .hero::before { display: none; }
+    .content { padding: 28px 16px; }
+    .example-header { padding: 14px 18px; }
+    .example-body { padding: 16px 18px; }
+    .mock-header { flex-direction: column; }
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-left">
+    <a href="../index.html" class="nav-back">← All Chapters</a>
+    <span style="color:rgba(255,255,255,0.2)">|</span>
+    <span class="nav-title">Chapter 3</span>
+  </div>
+  <div class="nav-tabs">
+    <button class="nav-tab active" onclick="switchTab('summary')">📖 Summary</button>
+    <button class="nav-tab" onclick="switchTab('examples')">🧮 Examples</button>
+    <button class="nav-tab" onclick="switchTab('mock')">🧪 Mock Test</button>
+    <button class="nav-tab" onclick="switchTab('cheatsheet')">⚡ Cheat Sheet</button>
+  </div>
+</nav>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-inner">
+    <div class="hero-tag">Chapter 3</div>
+    <h1>Discrete Random Variables<br><em>&amp; Distributions</em></h1>
+    <p>Random variables, PMF, CDF, mean &amp; variance, Bernoulli, Binomial, Geometric, Poisson, and Uniform distributions.</p>
+    <div class="hero-pills">
+      <span class="hero-pill">9 Concepts</span>
+      <span class="hero-pill">12 Worked Examples</span>
+      <span class="hero-pill">12-Question Mock Test</span>
+    </div>
+  </div>
+</div>
+
+<div class="content">
+
+<!-- ===== SUMMARY TAB ===== -->
+<div id="tab-summary" class="tab-content active">
+  <p class="section-label">Core Concepts</p>
+  <div class="summary-grid" id="concepts-grid"></div>
+</div>
+
+<!-- ===== EXAMPLES TAB ===== -->
+<div id="tab-examples" class="tab-content">
+  <p class="section-label">Worked Examples — Try Each Step Before Revealing</p>
+  <div id="examples-container"></div>
+</div>
+
+<!-- ===== MOCK TEST TAB ===== -->
+<div id="tab-mock" class="tab-content">
+  <div class="mock-header">
+    <div>
+      <h2>Mock Exam</h2>
+      <p>12 questions · Sections A, B &amp; C · Auto-graded with explanations</p>
+    </div>
+    <div class="mock-timer">
+      <div class="timer-val" id="timer-display">25:00</div>
+      <div class="timer-label">REMAINING</div>
+    </div>
+  </div>
+  <div class="progress-bar-wrap"><div class="progress-bar" id="mock-progress" style="width:0%"></div></div>
+  <div id="mock-container"></div>
+  <div class="submit-wrap">
+    <button class="submit-btn" id="submit-btn" onclick="submitMock()">Submit Exam</button>
+  </div>
+  <div class="results-panel" id="results-panel">
+    <div class="results-score" id="results-score">0/12</div>
+    <div class="results-label">Total Score</div>
+    <div class="results-bars">
+      <div class="result-stat"><div class="val" id="res-mcq">0/6</div><div class="lbl">Section A · MCQ</div></div>
+      <div class="result-stat"><div class="val" id="res-calc">0/3</div><div class="lbl">Section C · Calc</div></div>
+      <div class="result-stat"><div class="val" id="res-pct">0%</div><div class="lbl">Percentage</div></div>
+    </div>
+    <button class="retry-btn" onclick="resetMock()">Retry Test</button>
+  </div>
+</div>
+
+<!-- ===== CHEAT SHEET TAB ===== -->
+<div id="tab-cheatsheet" class="tab-content">
+  <p class="section-label">Formula Reference</p>
+  <div class="cheat-grid" id="cheat-grid"></div>
+  <p class="section-label" style="margin-top:36px">Common Exam Traps</p>
+  <ul class="trap-list" id="trap-list"></ul>
+</div>
+
+</div><!-- end .content -->
+
+<script>
+// ===================== DATA =====================
+
+const concepts = [
+  {
+    num: '01', title: 'Random Variable',
+    importance: 'KEY',
+    body: `<p>A <strong>random variable (X)</strong> is a function that assigns a numerical value to each outcome of a random experiment. Instead of working with raw outcomes (like HHT), we work with numbers.</p>
+    <div class="formula-box">
+      <strong>Example:</strong> Flip 3 coins. Let X = number of heads.<br><br>
+      HHH → X = 3 &nbsp;|&nbsp; HHT → X = 2 &nbsp;|&nbsp; HTT → X = 1 &nbsp;|&nbsp; TTT → X = 0
+    </div>
+    <p>💡 Random variables convert experiment outcomes into numbers we can calculate with.</p>
+    <div class="trap-box"><strong>⚠️ Discrete vs Continuous</strong> Discrete = countable values (0,1,2,...). Continuous = any value in an interval (time, weight). Chapter 3 covers <strong>discrete only</strong>.</div>`
+  },
+  {
+    num: '02', title: 'Probability Mass Function (PMF)',
+    importance: 'VERY IMPORTANT',
+    body: `<p>The PMF defines the probability for each possible value of X. It answers: "what is the chance X equals this specific number?"</p>
+    <div class="formula-box">
+      <strong>Definition:</strong> \\( f(x) = P(X = x) \\)<br><br>
+      <strong>Two conditions that MUST hold:</strong><br>
+      1. \\( f(x) \\geq 0 \\) for all x<br>
+      2. \\( \\displaystyle\\sum_{\\text{all } x} f(x) = 1 \\)
+    </div>
+    <div class="trap-box"><strong>⚠️ Exam Trap</strong> If probabilities don't sum to 1 → invalid PMF. Common MCQ: "find the missing probability" by setting the sum equal to 1.</div>`
+  },
+  {
+    num: '03', title: 'Cumulative Distribution Function (CDF)',
+    importance: 'STANDARD',
+    body: `<p>The CDF gives the probability that X is at most some value — it's the <strong>running total</strong> of probabilities.</p>
+    <div class="formula-box">
+      \\( F(x) = P(X \\leq x) = \\displaystyle\\sum_{t \\leq x} f(t) \\)
+    </div>
+    <p>Properties of CDF:</p>
+    <ul style="font-size:0.88rem;line-height:1.9;padding-left:18px;color:#374151">
+      <li>\\( F(x) \\) is non-decreasing</li>
+      <li>\\( 0 \\leq F(x) \\leq 1 \\)</li>
+      <li>\\( P(a < X \\leq b) = F(b) - F(a) \\)</li>
+    </ul>
+    <p style="margin-top:10px">💡 To convert CDF back to PMF: \\( f(x) = F(x) - F(x^-) \\) — the "jump" at each value.</p>`
+  },
+  {
+    num: '04', title: 'Mean (Expected Value) & Variance',
+    importance: 'HIGHLY TESTED',
+    body: `<p>The <strong>mean</strong> is the long-run average outcome. <strong>Variance</strong> measures how spread out the values are.</p>
+    <div class="formula-box">
+      <strong>Mean:</strong><br>
+      \\( \\mu = E(X) = \\displaystyle\\sum_{x} x \\cdot f(x) \\)<br><br>
+      <strong>Variance (two equivalent formulas):</strong><br>
+      \\( Var(X) = \\displaystyle\\sum_{x} (x - \\mu)^2 f(x) \\)<br><br>
+      <strong>Shortcut:</strong> \\( Var(X) = E(X^2) - [E(X)]^2 \\)<br><br>
+      <strong>Standard Deviation:</strong> \\( \\sigma = \\sqrt{Var(X)} \\)
+    </div>
+    <div class="trap-box"><strong>⚠️ Most common mistake</strong> Forgetting to square (x − μ), or using the shortcut formula incorrectly. Always verify: Var(X) ≥ 0.</div>`
+  },
+  {
+    num: '05', title: 'Bernoulli & Binomial Distribution',
+    importance: 'EXAM TRAP',
+    body: `<p><strong>Bernoulli</strong> = a single trial with two outcomes (success/failure).</p>
+    <div class="formula-box">
+      <strong>Bernoulli:</strong> \\( P(X=1)=p, \\quad P(X=0)=1-p \\)<br><br>
+      <strong>Binomial</strong> (n trials, constant p, independent):<br>
+      \\( P(X=x) = \\binom{n}{x} p^x (1-p)^{n-x} \\)<br><br>
+      \\( E(X) = np \\qquad Var(X) = np(1-p) \\)
+    </div>
+    <p><strong>Conditions for Binomial:</strong></p>
+    <ul style="font-size:0.88rem;line-height:1.9;padding-left:18px;color:#374151">
+      <li>Fixed number of trials n</li>
+      <li>Each trial has two outcomes</li>
+      <li>Trials are independent</li>
+      <li>Same probability p each trial</li>
+    </ul>
+    <div class="trap-box"><strong>⚠️ Independence Trap</strong> Drawing without replacement = NOT binomial. Probability changes each draw → not constant p.</div>`
+  },
+  {
+    num: '06', title: 'Geometric Distribution',
+    importance: 'KEY',
+    body: `<p>Models the number of trials until the <strong>first success</strong>. Unlike binomial, you don't fix n in advance.</p>
+    <div class="formula-box">
+      \\( P(X=x) = (1-p)^{x-1} p \\quad \\text{for } x = 1, 2, 3, \\ldots \\)<br><br>
+      \\( E(X) = \\dfrac{1}{p} \\qquad Var(X) = \\dfrac{1-p}{p^2} \\)
+    </div>
+    <p>🔥 <strong>Memoryless Property</strong> — the most tested geometric fact:</p>
+    <div class="formula-box">
+      \\( P(X > s+t \\mid X > s) = P(X > t) \\)
+    </div>
+    <p>Intuition: given that the first s trials failed, the process "resets" — past failures don't affect future probabilities.</p>`
+  },
+  {
+    num: '07', title: 'Poisson Distribution',
+    importance: 'VERY IMPORTANT',
+    body: `<p>Models the <strong>count of rare events</strong> in a fixed interval of time or space. Use when events occur at a constant average rate.</p>
+    <div class="formula-box">
+      \\( P(X=x) = \\dfrac{\\lambda^x e^{-\\lambda}}{x!} \\quad \\text{for } x = 0, 1, 2, \\ldots \\)<br><br>
+      \\( E(X) = \\lambda \\qquad Var(X) = \\lambda \\)
+    </div>
+    <p>💡 Key fact: Mean = Variance = λ (used to identify Poisson in MCQs).</p>
+    <p style="margin-top:10px"><strong>Use Poisson when:</strong> n is large, p is small, np = λ is moderate.</p>
+    <div class="trap-box"><strong>⚠️ Scaling λ</strong> If rate is 2.3 per mm and you need 5 mm: λ = 2.3 × 5 = 11.5. Always scale λ to match the interval!</div>`
+  },
+  {
+    num: '08', title: 'Discrete Uniform Distribution',
+    importance: 'STANDARD',
+    body: `<p>All values in the range are <strong>equally likely</strong>. Simple but tested in MCQs.</p>
+    <div class="formula-box">
+      Values: a, a+1, ..., b &nbsp;&nbsp; (total of b−a+1 values)<br><br>
+      \\( f(x) = \\dfrac{1}{b-a+1} \\)<br><br>
+      \\( E(X) = \\dfrac{a+b}{2} \\qquad Var(X) = \\dfrac{(b-a+1)^2 - 1}{12} \\)
+    </div>`
+  },
+  {
+    num: '09', title: 'Problem-Solving Strategy',
+    importance: 'KEY',
+    body: `<p>Follow this checklist in every problem to avoid costly mistakes:</p>
+    <div class="formula-box">
+      <strong>Step 1:</strong> Is X discrete or continuous?<br>
+      <strong>Step 2:</strong> Define X clearly in words.<br>
+      <strong>Step 3:</strong> Identify the distribution:<br>
+      &nbsp;&nbsp;• Single trial? → Bernoulli<br>
+      &nbsp;&nbsp;• Fixed n trials? → Binomial<br>
+      &nbsp;&nbsp;• Trials until first success? → Geometric<br>
+      &nbsp;&nbsp;• Count of events in interval? → Poisson<br>
+      &nbsp;&nbsp;• All values equal likely? → Uniform<br>
+      <strong>Step 4:</strong> Find parameters (n, p, λ, etc.)<br>
+      <strong>Step 5:</strong> Apply formula &amp; compute.
+    </div>
+    <div class="trap-box"><strong>⚠️ Check Independence</strong> Before applying Binomial, always verify: are trials truly independent? Without replacement = not independent.</div>`
+  }
+];
+
+// ===================== EXAMPLES DATA =====================
+const examples = [
+  {
+    id: 'ex31', num: 'Ex 3.1', title: 'Flash Recharge Time — Binomial',
+    question: `The probability that a camera passes a flash recharge test is 0.8. Three cameras are tested independently. Let X = number of cameras that pass.
+    <br><br>(a) Find P(first passes, second passes, third fails). &nbsp; (b) Construct the probability distribution of X.`,
+    steps: [
+      {
+        q: 'What type of distribution is X?',
+        opts: ['Geometric — trials until first success', 'Binomial — fixed n=3 trials, constant p=0.8', 'Poisson — count of events', 'Uniform — all values equally likely'],
+        correct: 1,
+        fb_correct: '✓ Correct! Fixed n=3, two outcomes, independent, constant p=0.8 → Binomial.',
+        fb_wrong: 'X follows a Binomial distribution: fixed n=3 independent trials, each with p=0.8.'
+      },
+      {
+        q: 'Find P(Pass, Pass, Fail) = P(1st passes) × P(2nd passes) × P(3rd fails)',
+        opts: ['0.8 + 0.8 + 0.2 = 1.8', '0.8 × 0.8 × 0.2 = 0.128', '0.8 × 0.8 × 0.8 = 0.512', '0.2 × 0.2 × 0.8 = 0.032'],
+        correct: 1,
+        fb_correct: '✓ P(Pass, Pass, Fail) = 0.8 × 0.8 × 0.2 = 0.128. Independence allows multiplication.',
+        fb_wrong: 'Multiply independent probabilities: 0.8 × 0.8 × 0.2 = 0.128.'
+      },
+      {
+        q: 'What is P(X=3)? (All three cameras pass)',
+        opts: ['0.096', '0.384', '0.512', '0.8'],
+        correct: 2,
+        fb_correct: '✓ P(X=3) = (0.8)³ = 0.512',
+        fb_wrong: 'P(X=3) = C(3,3)(0.8)³(0.2)⁰ = 1 × 0.512 × 1 = 0.512'
+      }
+    ],
+    solution: `<h4>Full Solution</h4>
+<p><strong>(a)</strong> By independence: \\( P(\\text{Pass, Pass, Fail}) = (0.8)(0.8)(0.2) = 0.128 \\)</p>
+<p style="margin-top:10px"><strong>(b) Full Distribution using Binomial(n=3, p=0.8):</strong></p>
+<p>\\( P(X=0) = \\binom{3}{0}(0.8)^0(0.2)^3 = 0.008 \\)</p>
+<p>\\( P(X=1) = \\binom{3}{1}(0.8)^1(0.2)^2 = 3(0.8)(0.04) = 0.096 \\)</p>
+<p>\\( P(X=2) = \\binom{3}{2}(0.8)^2(0.2)^1 = 3(0.64)(0.2) = 0.384 \\)</p>
+<p>\\( P(X=3) = \\binom{3}{3}(0.8)^3(0.2)^0 = 0.512 \\)</p>
+<p style="margin-top:8px">✓ Check: 0.008 + 0.096 + 0.384 + 0.512 = 1.00 ✅</p>`
+  },
+  {
+    id: 'ex32', num: 'Ex 3.2', title: 'Digital Channel — Binomial Distribution',
+    question: `There is a 0.1 probability that a bit transmitted through a digital channel is received in error. The bits are transmitted independently. Let X = number of bits received in error in the next 4 bits.
+    <br><br>(a) Construct the full distribution. &nbsp; (b) Find P(X ≤ 3).`,
+    table: {
+      headers: ['X', '0', '1', '2', '3', '4'],
+      rows: [
+        ['P(X=x)', '0.6561', '0.2916', '0.0486', '0.0036', '0.0001']
+      ]
+    },
+    steps: [
+      {
+        q: 'Identify the parameters for this binomial distribution.',
+        opts: ['n=4, p=0.9', 'n=4, p=0.1', 'n=10, p=0.1', 'n=4, p=0.5'],
+        correct: 1,
+        fb_correct: '✓ n=4 bits, p=0.1 (probability of error). The binomial counts errors.',
+        fb_wrong: 'n = 4 (number of bits) and p = 0.1 (probability each bit is an error).'
+      },
+      {
+        q: 'Compute P(X=0) = C(4,0)(0.1)⁰(0.9)⁴',
+        opts: ['0.9', '0.0001', '0.6561', '0.2916'],
+        correct: 2,
+        fb_correct: '✓ P(X=0) = 1 × 1 × (0.9)⁴ = 0.6561',
+        fb_wrong: 'P(X=0) = C(4,0)(0.1)⁰(0.9)⁴ = 1 × 1 × 0.6561 = 0.6561'
+      },
+      {
+        q: 'Find P(X ≤ 3) using the complement.',
+        opts: ['1 − P(X=4) = 1 − 0.0001 = 0.9999', '0.6561 + 0.2916 = 0.9477', '0.2916 + 0.0486 + 0.0036 = 0.3438', '0.6561 only = 0.6561'],
+        correct: 0,
+        fb_correct: '✓ Complement trick: P(X≤3) = 1 − P(X=4) = 1 − 0.0001 = 0.9999',
+        fb_wrong: 'Use the complement: P(X≤3) = 1 − P(X=4) = 1 − 0.0001 = 0.9999. Much faster!'
+      }
+    ],
+    solution: `<h4>Full Solution</h4>
+<p><strong>Binomial(n=4, p=0.1):</strong></p>
+<p>\\( P(X=0) = (0.9)^4 = 0.6561 \\)<br>
+\\( P(X=1) = 4(0.1)(0.9)^3 = 0.2916 \\)<br>
+\\( P(X=2) = 6(0.1)^2(0.9)^2 = 0.0486 \\)<br>
+\\( P(X=3) = 4(0.1)^3(0.9) = 0.0036 \\)<br>
+\\( P(X=4) = (0.1)^4 = 0.0001 \\)</p>
+<p style="margin-top:10px"><strong>(b)</strong> \\( P(X \\leq 3) = 1 - P(X=4) = 1 - 0.0001 = \\mathbf{0.9999} \\)</p>`
+  },
+  {
+    id: 'ex33', num: 'Ex 3.3', title: 'Wafer Contamination — Geometric Distribution',
+    question: `The probability that a wafer contains a large particle is 0.01. Wafers are inspected one by one. Let X = number of wafers inspected until the first contaminated wafer.
+    <br><br>(a) Find P(X=1), P(X=2), P(X=3). &nbsp; (b) Write the general formula.`,
+    steps: [
+      {
+        q: 'Why is this Geometric and not Binomial?',
+        opts: [
+          'Because p = 0.01 is very small',
+          'Because we count trials until the FIRST success — n is not fixed in advance',
+          'Because wafers are not independent',
+          'Because there are more than 2 outcomes'
+        ],
+        correct: 1,
+        fb_correct: '✓ Geometric: we keep going until the first success. We do not fix n in advance.',
+        fb_wrong: 'Geometric: no fixed n — we stop at the first success. Binomial requires a pre-set n.'
+      },
+      {
+        q: 'Find P(X=2): The 1st wafer is clean AND the 2nd is contaminated.',
+        opts: ['(0.01)²', '(0.99)(0.01)', '(0.01)(0.99)', '(0.99)²(0.01)'],
+        correct: 1,
+        fb_correct: '✓ P(X=2) = P(clean) × P(contaminated) = 0.99 × 0.01 = 0.0099',
+        fb_wrong: 'P(X=2) = (1-p)^(2-1) × p = 0.99 × 0.01 = 0.0099'
+      },
+      {
+        q: 'What is the general formula P(X=x)?',
+        opts: [
+          'C(x,1)(0.01)^x(0.99)^(x-1)',
+          '(0.99)^(x-1)(0.01)',
+          '(0.01)^x(0.99)',
+          '(0.99)^x(0.01)'
+        ],
+        correct: 1,
+        fb_correct: '✓ P(X=x) = (1-p)^(x-1) × p = (0.99)^(x-1)(0.01)',
+        fb_wrong: 'Geometric formula: P(X=x) = (1-p)^(x-1) × p = (0.99)^(x-1)(0.01)'
+      }
+    ],
+    solution: `<h4>Full Solution</h4>
+<p>\\( P(X=1) = 0.01 \\)</p>
+<p>\\( P(X=2) = (0.99)(0.01) = 0.0099 \\)</p>
+<p>\\( P(X=3) = (0.99)^2(0.01) = 0.009801 \\)</p>
+<p style="margin-top:10px"><strong>General formula:</strong> \\( P(X=x) = (0.99)^{x-1}(0.01) \\quad x = 1, 2, 3, \\ldots \\)</p>`
+  },
+  {
+    id: 'ex34', num: 'Ex 3.4', title: 'CDF to PMF — Finding the Jump',
+    question: `The CDF of a discrete random variable X is:<br><br>
+    F(x) = 0 for x < −2; &nbsp; F(x) = 0.2 for −2 ≤ x < 0; &nbsp; F(x) = 0.7 for 0 ≤ x < 2; &nbsp; F(x) = 1 for x ≥ 2<br><br>
+    Find the PMF f(x).`,
+    steps: [
+      {
+        q: 'How do you recover the PMF from the CDF?',
+        opts: [
+          'Multiply consecutive CDF values',
+          'Find the "jump" (difference) at each value where CDF changes',
+          'Divide CDF values by the range',
+          'Integrate the CDF'
+        ],
+        correct: 1,
+        fb_correct: '✓ PMF = jump size at each discontinuity. f(x) = F(x) − F(x⁻)',
+        fb_wrong: 'For discrete distributions: f(x) = F(x) − F(x⁻) — the size of the jump at each value.'
+      },
+      {
+        q: 'Find f(−2):',
+        opts: ['0.2 − 0 = 0.2', '0.7 − 0.2 = 0.5', '1 − 0.7 = 0.3', '0.7'],
+        correct: 0,
+        fb_correct: '✓ f(−2) = F(−2) − F(−2⁻) = 0.2 − 0 = 0.2',
+        fb_wrong: 'f(−2) = jump at x=−2 = 0.2 − 0 = 0.2'
+      },
+      {
+        q: 'Find f(0) and f(2):',
+        opts: [
+          'f(0)=0.7, f(2)=1',
+          'f(0)=0.5, f(2)=0.3',
+          'f(0)=0.7 − 0.2 = 0.5, f(2)=1 − 0.7 = 0.3',
+          'f(0)=0.2, f(2)=0.7'
+        ],
+        correct: 2,
+        fb_correct: '✓ f(0) = 0.7 − 0.2 = 0.5 and f(2) = 1 − 0.7 = 0.3. Sum = 0.2+0.5+0.3 = 1 ✅',
+        fb_wrong: 'f(0) = jump at 0 = 0.7−0.2 = 0.5; f(2) = jump at 2 = 1−0.7 = 0.3'
+      }
+    ],
+    solution: `<h4>Full Solution</h4>
+<p>The PMF is found by computing the jump at each discontinuity:</p>
+<p>\\( f(-2) = 0.2 - 0 = 0.2 \\)</p>
+<p>\\( f(0) = 0.7 - 0.2 = 0.5 \\)</p>
+<p>\\( f(2) = 1 - 0.7 = 0.3 \\)</p>
+<p style="margin-top:10px">✓ Check: 0.2 + 0.5 + 0.3 = 1.00 ✅</p>`
+  },
+  {
+    id: 'ex35', num: 'Ex 3.5', title: 'Mean & Variance of Binomial',
+    question: `A random variable X follows a Binomial distribution with n = 4 and p = 0.1 (digital channel errors).
+    <br><br>Find: (a) E(X) &nbsp; (b) Var(X) &nbsp; (c) Standard deviation.`,
+    steps: [
+      {
+        q: 'What is E(X) = np?',
+        opts: ['np = 4 × 0.1 = 0.4', 'np = 4 × 0.9 = 3.6', 'np = 0.1 + 0.9 = 1', 'np = 4 + 0.1 = 4.1'],
+        correct: 0,
+        fb_correct: '✓ E(X) = np = 4 × 0.1 = 0.4. On average, 0.4 bits out of 4 are in error.',
+        fb_wrong: 'Binomial mean: E(X) = np = 4 × 0.1 = 0.4'
+      },
+      {
+        q: 'What is Var(X) = np(1−p)?',
+        opts: ['4 × 0.1 × 0.9 = 0.36', '4 × 0.1 = 0.4', '0.1 × 0.9 = 0.09', '4 × 0.9 = 3.6'],
+        correct: 0,
+        fb_correct: '✓ Var(X) = np(1−p) = 4 × 0.1 × 0.9 = 0.36',
+        fb_wrong: 'Binomial variance: Var(X) = np(1−p) = 4 × 0.1 × 0.9 = 0.36'
+      },
+      {
+        q: 'Standard deviation σ = √Var(X) = √0.36 = ?',
+        opts: ['0.60', '0.36', '0.18', '1.20'],
+        correct: 0,
+        fb_correct: '✓ σ = √0.36 = 0.60',
+        fb_wrong: 'σ = √Var(X) = √0.36 = 0.60'
+      }
+    ],
+    solution: `<h4>Full Solution</h4>
+<p><strong>(a)</strong> \\( E(X) = np = 4(0.1) = \\mathbf{0.4} \\)</p>
+<p><strong>(b)</strong> \\( Var(X) = np(1-p) = 4(0.1)(0.9) = \\mathbf{0.36} \\)</p>
+<p><strong>(c)</strong> \\( \\sigma = \\sqrt{0.36} = \\mathbf{0.60} \\)</p>`
+  },
+  {
+    id: 'ex36', num: 'Ex 3.6', title: 'Geometric Mean, Variance & Large Value',
+    question: `Wafer contamination probability is 0.01 (geometric model). Find: (a) Mean (b) Variance (c) P(X = 125).`,
+    steps: [
+      {
+        q: 'What is E(X) = 1/p?',
+        opts: ['1/0.01 = 100', '0.01', '0.01/0.99 ≈ 0.0101', '0.99/0.01 = 99'],
+        correct: 0,
+        fb_correct: '✓ E(X) = 1/p = 1/0.01 = 100. Expect to inspect 100 wafers before finding the first contaminated one.',
+        fb_wrong: 'Geometric mean: E(X) = 1/p = 1/0.01 = 100'
+      },
+      {
+        q: 'What is Var(X) = (1−p)/p²?',
+        opts: ['0.99/0.0001 = 9900', '0.01/0.99 = 0.0101', '1/0.01 = 100', '0.99 × 0.01 = 0.0099'],
+        correct: 0,
+        fb_correct: '✓ Var(X) = (1−p)/p² = 0.99/0.0001 = 9900',
+        fb_wrong: 'Geometric variance: Var(X) = (1−p)/p² = 0.99/(0.01)² = 9900'
+      },
+      {
+        q: 'Find P(X=125) = (0.99)¹²⁴(0.01):',
+        opts: ['≈ 0.00289', '≈ 0.0099', '≈ 0.0125', '≈ 0.01'],
+        correct: 0,
+        fb_correct: '✓ P(X=125) = (0.99)¹²⁴(0.01) ≈ 0.00289',
+        fb_wrong: 'P(X=125) = (0.99)^124 × 0.01 ≈ 0.289 × 0.01 ≈ 0.00289'
+      }
+    ],
+    solution: `<h4>Full Solution</h4>
+<p><strong>(a)</strong> \\( E(X) = \\dfrac{1}{p} = \\dfrac{1}{0.01} = \\mathbf{100} \\)</p>
+<p><strong>(b)</strong> \\( Var(X) = \\dfrac{1-p}{p^2} = \\dfrac{0.99}{0.0001} = \\mathbf{9900} \\)</p>
+<p><strong>(c)</strong> \\( P(X=125) = (0.99)^{124}(0.01) \\approx \\mathbf{0.00289} \\)</p>`
+  },
+  {
+    id: 'ex37', num: 'Ex 3.7', title: 'Poisson — Flaws Along Wire',
+    question: `Flaws occur randomly along a wire at an average rate of 2.3 per mm. Find the probability of exactly 10 flaws in 5 mm of wire.`,
+    steps: [
+      {
+        q: 'What is λ for a 5 mm segment?',
+        opts: ['λ = 2.3', 'λ = 2.3 / 5 = 0.46', 'λ = 2.3 × 5 = 11.5', 'λ = 5'],
+        correct: 2,
+        fb_correct: '✓ Scale the rate: λ = 2.3 per mm × 5 mm = 11.5 for a 5 mm segment.',
+        fb_wrong: 'Multiply rate by length: λ = 2.3 × 5 = 11.5. Always scale λ to match your interval!'
+      },
+      {
+        q: 'Which distribution applies here?',
+        opts: ['Binomial — fixed n trials', 'Geometric — trials until first success', 'Poisson — count of events in a fixed interval', 'Uniform — all values equally likely'],
+        correct: 2,
+        fb_correct: '✓ Poisson: counting occurrences of a random event in a fixed interval (length of wire).',
+        fb_wrong: 'Poisson is used for counts of rare events in fixed intervals (time, space, length).'
+      },
+      {
+        q: 'P(X=10) = e^(−11.5) × 11.5^10 / 10! — approximately:',
+        opts: ['≈ 0.1129', '≈ 0.0514', '≈ 0.2340', '≈ 0.3678'],
+        correct: 0,
+        fb_correct: '✓ P(X=10) ≈ 0.1129 (computed via Poisson formula with λ=11.5).',
+        fb_wrong: 'Apply the Poisson formula with λ=11.5, x=10: P(X=10) = e^(-11.5)(11.5^10)/10! ≈ 0.1129'
+      }
+    ],
+    solution: `<h4>Full Solution</h4>
+<p>Scale rate to 5 mm: \\( \\lambda = 2.3 \\times 5 = 11.5 \\)</p>
+<p style="margin-top:10px">\\( P(X=10) = \\dfrac{e^{-11.5} \\cdot 11.5^{10}}{10!} \\approx \\mathbf{0.1129} \\)</p>
+<p style="margin-top:10px">💡 Remember: Mean = Variance = λ = 11.5 for this Poisson distribution.</p>`
+  },
+  {
+    id: 'ex38', num: 'Ex 3.8', title: '"At Least" Using Complement',
+    question: `A student guesses on a 10-question MCQ test. Each question has 4 choices (p = 0.25). Find the probability of getting at least 1 correct answer.`,
+    steps: [
+      {
+        q: 'Why use the complement approach here?',
+        opts: [
+          'Because p = 0.25 is too small',
+          'Computing "at least 1" directly requires summing P(X=1) through P(X=10) — 10 calculations. The complement P(X=0) needs just 1.',
+          'The binomial formula doesn\'t work here',
+          'The complement is always required for binomial problems'
+        ],
+        correct: 1,
+        fb_correct: '✓ P(X≥1) = 1 − P(X=0). The complement avoids summing 10 probabilities.',
+        fb_wrong: 'Complement trick: P(X≥1) = 1 − P(X=0). One calculation instead of ten!'
+      },
+      {
+        q: 'P(X=0) = (0.75)^10 ≈',
+        opts: ['0.0563', '0.25', '0.9437', '0.1'],
+        correct: 0,
+        fb_correct: '✓ P(X=0) = (0.75)^10 ≈ 0.0563',
+        fb_wrong: 'P(X=0) = C(10,0)(0.25)⁰(0.75)^10 = (0.75)^10 ≈ 0.0563'
+      },
+      {
+        q: 'Therefore P(X ≥ 1) = ?',
+        opts: ['0.0563', '0.9437', '0.25', '0.5'],
+        correct: 1,
+        fb_correct: '✓ P(X≥1) = 1 − 0.0563 = 0.9437. Very likely to get at least one right by guessing!',
+        fb_wrong: 'P(X≥1) = 1 − P(X=0) = 1 − 0.0563 = 0.9437'
+      }
+    ],
+    solution: `<h4>Full Solution</h4>
+<p>Binomial(n=10, p=0.25). Use complement:</p>
+<p>\\( P(X \\geq 1) = 1 - P(X=0) = 1 - (0.75)^{10} \\approx 1 - 0.0563 = \\mathbf{0.9437} \\)</p>`
+  },
+  {
+    id: 'ex39', num: 'Ex 3.9', title: 'Binomial — Interval Probability',
+    question: `A machine produces items with defect probability p = 0.2. A batch of n = 6 items is selected. Find P(2 ≤ X ≤ 4).`,
+    steps: [
+      {
+        q: 'P(2 ≤ X ≤ 4) = ?',
+        opts: [
+          'P(X=2) + P(X=3) + P(X=4)',
+          '1 − P(X=0) − P(X=1)',
+          'P(X=2) × P(X=3) × P(X=4)',
+          'P(X≤4) only'
+        ],
+        correct: 0,
+        fb_correct: '✓ Sum three separate probabilities: P(2) + P(3) + P(4).',
+        fb_wrong: 'P(2 ≤ X ≤ 4) = P(X=2) + P(X=3) + P(X=4). Sum all included values.'
+      },
+      {
+        q: 'P(X=2) = C(6,2)(0.2)²(0.8)⁴ = ?',
+        opts: ['0.1536', '0.2458', '0.0819', '0.0154'],
+        correct: 1,
+        fb_correct: '✓ P(X=2) = 15 × 0.04 × 0.4096 = 0.2458',
+        fb_wrong: 'P(X=2) = C(6,2)(0.2)²(0.8)⁴ = 15 × 0.04 × 0.4096 = 0.2458'
+      },
+      {
+        q: 'P(X=3)=0.0819, P(X=4)=0.0154. So P(2≤X≤4) = ?',
+        opts: ['0.2458 + 0.0819 + 0.0154 = 0.3431', '0.2458 only', '0.0819 + 0.0154 = 0.0973', '0.5000'],
+        correct: 0,
+        fb_correct: '✓ P(2≤X≤4) = 0.2458 + 0.0819 + 0.0154 = 0.3431',
+        fb_wrong: '0.2458 + 0.0819 + 0.0154 = 0.3431'
+      }
+    ],
+    solution: `<h4>Full Solution</h4>
+<p>Binomial(n=6, p=0.2):</p>
+<p>\\( P(X=2) = \\binom{6}{2}(0.2)^2(0.8)^4 = 15(0.04)(0.4096) = 0.2458 \\)</p>
+<p>\\( P(X=3) = \\binom{6}{3}(0.2)^3(0.8)^3 = 20(0.008)(0.512) = 0.0819 \\)</p>
+<p>\\( P(X=4) = \\binom{6}{4}(0.2)^4(0.8)^2 = 15(0.0016)(0.64) = 0.0154 \\)</p>
+<p style="margin-top:10px">\\( P(2 \\leq X \\leq 4) = 0.2458 + 0.0819 + 0.0154 = \\mathbf{0.3431} \\)</p>`
+  },
+  {
+    id: 'ex310', num: 'Ex 3.10', title: 'Independence Check — Is it Binomial?',
+    question: `A box contains 5 defective and 5 good items. Two items are selected <strong>without replacement</strong>. Can we use the binomial distribution?`,
+    steps: [
+      {
+        q: 'What is the key condition that must hold for Binomial?',
+        opts: [
+          'There must be exactly 2 outcomes per trial',
+          'Trials must be independent AND p must be constant across trials',
+          'n must be at least 10',
+          'p must equal 0.5'
+        ],
+        correct: 1,
+        fb_correct: '✓ Binomial requires: independence AND constant p. Both are violated here.',
+        fb_wrong: 'Binomial needs: independent trials AND constant probability p each trial.'
+      },
+      {
+        q: 'After drawing 1 defective item without replacement, P(2nd is defective) changes to:',
+        opts: ['5/10 = 0.5 (unchanged)', '4/9 ≈ 0.444 (changed!)', '5/9 ≈ 0.556', '4/10 = 0.4'],
+        correct: 1,
+        fb_correct: '✓ 4 defective remain out of 9 items → p changes. Trials are dependent!',
+        fb_wrong: 'After removing 1 defective: 4 defective out of 9 total → P = 4/9 ≠ 5/10. Not constant!'
+      },
+      {
+        q: 'Conclusion:',
+        opts: [
+          'Yes, use Binomial because there are 2 outcomes',
+          'No, Binomial is invalid — trials are NOT independent, p is NOT constant',
+          'Use Binomial only for the first draw',
+          'Use Poisson instead'
+        ],
+        correct: 1,
+        fb_correct: '✓ Without replacement = dependent trials = NOT binomial. Use hypergeometric distribution instead.',
+        fb_wrong: 'Without replacement violates independence AND constant p → cannot use Binomial.'
+      }
+    ],
+    solution: `<h4>Full Solution</h4>
+<p><strong>No — cannot use Binomial.</strong></p>
+<p>Without replacement means:</p>
+<ul style="font-size:0.87rem;line-height:1.9;padding-left:18px;color:#374151">
+  <li>Trials are <strong>not independent</strong> — outcome of 1st draw affects 2nd</li>
+  <li>Probability <strong>changes</strong> after each draw: 5/10 → 4/9 or 5/9</li>
+</ul>
+<p style="margin-top:10px">The correct distribution for sampling without replacement is the <strong>Hypergeometric distribution</strong>.</p>`
+  },
+  {
+    id: 'ex311', num: 'Ex 3.11', title: 'Poisson — Call Center',
+    question: `A call center receives on average 4 calls per minute. Find: (a) P(exactly 2 calls in a minute) &nbsp; (b) P(at least 1 call).`,
+    steps: [
+      {
+        q: 'P(X=2) with λ=4: P = e^(−4) × 4² / 2!',
+        opts: ['≈ 0.2707', '≈ 0.1465', '≈ 0.0916', '≈ 0.3679'],
+        correct: 1,
+        fb_correct: '✓ P(X=2) = e^(-4) × 16 / 2 = e^(-4) × 8 ≈ 0.0183 × 8 ≈ 0.1465',
+        fb_wrong: 'P(X=2) = e^(-4)(4²)/2! = e^(-4)(16)/2 ≈ 0.1465'
+      },
+      {
+        q: 'Find P(X ≥ 1) using complement:',
+        opts: [
+          '1 − P(X=0) = 1 − e^(−4) ≈ 1 − 0.0183 = 0.9817',
+          'P(X=1) = 4e^(−4) ≈ 0.0733',
+          '1 − P(X=1) ≈ 0.9267',
+          'e^(−4) ≈ 0.0183'
+        ],
+        correct: 0,
+        fb_correct: '✓ P(X≥1) = 1 − P(X=0) = 1 − e^(-4) ≈ 1 − 0.0183 = 0.9817',
+        fb_wrong: 'Complement: P(X≥1) = 1 − P(X=0) = 1 − e^(-4) ≈ 0.9817'
+      }
+    ],
+    solution: `<h4>Full Solution</h4>
+<p><strong>(a)</strong> \\( P(X=2) = \\dfrac{e^{-4} \\cdot 4^2}{2!} = \\dfrac{e^{-4} \\cdot 16}{2} \\approx \\mathbf{0.1465} \\)</p>
+<p style="margin-top:10px"><strong>(b)</strong> \\( P(X \\geq 1) = 1 - P(X=0) = 1 - e^{-4} \\approx 1 - 0.0183 = \\mathbf{0.9817} \\)</p>`
+  },
+  {
+    id: 'ex312', num: 'Ex 3.12', title: 'Discrete Uniform Distribution',
+    question: `A random variable X is uniformly distributed over integers from 3 to 8 inclusive.
+    <br><br>Find: (a) P(X=5) &nbsp; (b) E(X) &nbsp; (c) P(X > 5).`,
+    steps: [
+      {
+        q: 'How many values does X take?',
+        opts: ['8 − 3 = 5', '8 − 3 + 1 = 6', '8', '3'],
+        correct: 1,
+        fb_correct: '✓ Values: {3, 4, 5, 6, 7, 8} → 6 values total. Always include both endpoints.',
+        fb_wrong: 'b − a + 1 = 8 − 3 + 1 = 6 values: {3, 4, 5, 6, 7, 8}'
+      },
+      {
+        q: 'P(X=5) and E(X) = (a+b)/2:',
+        opts: ['P(X=5) = 1/6, E(X) = 5', 'P(X=5) = 1/5, E(X) = 5.5', 'P(X=5) = 1/6, E(X) = 5.5', 'P(X=5) = 0.2, E(X) = 5'],
+        correct: 2,
+        fb_correct: '✓ P(X=5) = 1/6 (uniform). E(X) = (3+8)/2 = 11/2 = 5.5',
+        fb_wrong: 'P(X=5) = 1/6 (each value equally likely). E(X) = (3+8)/2 = 5.5'
+      },
+      {
+        q: 'Find P(X > 5):',
+        opts: ['P(X=6) + P(X=7) + P(X=8) = 3/6 = 0.5', '1 − 1/6 ≈ 0.833', '2/6 ≈ 0.333', '1/6'],
+        correct: 0,
+        fb_correct: '✓ Values > 5 are {6, 7, 8} → P = 3/6 = 0.5',
+        fb_wrong: 'P(X > 5) = P(6) + P(7) + P(8) = 3 × (1/6) = 3/6 = 0.5'
+      }
+    ],
+    solution: `<h4>Full Solution</h4>
+<p>X takes 6 equally likely values: {3, 4, 5, 6, 7, 8}, each with probability 1/6.</p>
+<p><strong>(a)</strong> \\( P(X=5) = \\dfrac{1}{6} \\approx 0.167 \\)</p>
+<p><strong>(b)</strong> \\( E(X) = \\dfrac{a+b}{2} = \\dfrac{3+8}{2} = \\mathbf{5.5} \\)</p>
+<p><strong>(c)</strong> \\( P(X > 5) = P(6)+P(7)+P(8) = \\dfrac{3}{6} = \\mathbf{0.5} \\)</p>`
+  }
+];
+
+// ===================== MOCK TEST DATA =====================
+const mockQuestions = [
+  // SECTION A — MCQ
+  { id:'m1', section:'A', type:'mcq',
+    text: 'Which condition is NOT required for a Binomial distribution?',
+    opts: ['Fixed number of trials n', 'Trials must be independent', 'Probability p changes each trial', 'Only two outcomes per trial'],
+    correct: 2,
+    explanation: 'Binomial requires constant p each trial. Changing probability violates this condition.'
+  },
+  { id:'m2', section:'A', type:'mcq',
+    text: 'A random variable has PMF: P(X=1)=0.2, P(X=2)=0.5, P(X=3)=k. Find k.',
+    opts: ['0.2', '0.3', '0.5', '0.7'],
+    correct: 1,
+    explanation: 'All probabilities must sum to 1: 0.2 + 0.5 + k = 1 → k = 0.3'
+  },
+  { id:'m3', section:'A', type:'mcq',
+    text: 'For a Geometric distribution with p=0.1, what is E(X)?',
+    opts: ['0.1', '1', '9', '10'],
+    correct: 3,
+    explanation: 'E(X) = 1/p = 1/0.1 = 10. Expect 10 trials until first success.'
+  },
+  { id:'m4', section:'A', type:'mcq',
+    text: 'For a Poisson distribution, which statement is always true?',
+    opts: ['Mean > Variance', 'Mean < Variance', 'Mean = Variance = λ', 'Variance = λ²'],
+    correct: 2,
+    explanation: 'Key Poisson property: E(X) = Var(X) = λ. This is a common identification clue.'
+  },
+  { id:'m5', section:'A', type:'mcq',
+    text: 'A coin is flipped 3 times. P(X > 1) where X = number of heads?',
+    opts: ['1/8', '3/8', '4/8 = 1/2', '6/8'],
+    correct: 2,
+    explanation: 'P(X>1) = P(X=2) + P(X=3) = 3/8 + 1/8 = 4/8 = 0.5'
+  },
+  { id:'m6', section:'A', type:'mcq',
+    text: 'Items are selected WITHOUT replacement from a box. The appropriate distribution is:',
+    opts: ['Binomial', 'Geometric', 'Hypergeometric (NOT Binomial)', 'Poisson'],
+    correct: 2,
+    explanation: 'Without replacement = dependent trials = non-constant p → use Hypergeometric, not Binomial.'
+  },
+  // SECTION B
+  { id:'m7', section:'B', type:'mcq',
+    text: 'n=18, p=0.1 (water samples). Find P(X=2).',
+    opts: ['≈ 0.2835', '≈ 0.1500', '≈ 0.3002', '≈ 0.0900'],
+    correct: 0,
+    explanation: 'P(X=2) = C(18,2)(0.1)²(0.9)^16 = 153 × 0.01 × 0.1853 ≈ 0.2835'
+  },
+  { id:'m8', section:'B', type:'mcq',
+    text: 'n=18, p=0.1. Find P(X ≥ 4) using complement. [P(X≤3) ≈ 0.902]',
+    opts: ['≈ 0.098', '≈ 0.902', '≈ 0.283', '≈ 0.400'],
+    correct: 0,
+    explanation: 'P(X≥4) = 1 − P(X≤3) ≈ 1 − 0.902 = 0.098'
+  },
+  { id:'m9', section:'B', type:'mcq',
+    text: 'Flaws occur at 2.3 per mm. Find the mean and variance of flaws in 5 mm.',
+    opts: ['Mean=2.3, Var=2.3', 'Mean=11.5, Var=2.3', 'Mean=11.5, Var=11.5', 'Mean=2.3, Var=11.5'],
+    correct: 2,
+    explanation: 'λ = 2.3 × 5 = 11.5. For Poisson: Mean = Variance = λ = 11.5.'
+  },
+  { id:'m10', section:'B', type:'mcq',
+    text: 'Given CDF: F(0)=0.3, F(1)=0.8, F(2)=1.0. Find f(1) (the PMF at x=1).',
+    opts: ['0.3', '0.5', '0.8', '1.0'],
+    correct: 1,
+    explanation: 'f(1) = F(1) − F(0) = 0.8 − 0.3 = 0.5 (the jump in CDF at x=1).'
+  },
+  // SECTION C — Calculation
+  { id:'m11', section:'C', type:'calc',
+    text: 'Binomial(n=20, p=0.3). Find Var(X). [Formula: Var = np(1−p)]',
+    answer: '4.2',
+    tolerance: 0.01,
+    explanation: 'Var(X) = np(1−p) = 20 × 0.3 × 0.7 = 4.2'
+  },
+  { id:'m12', section:'C', type:'calc',
+    text: 'Poisson(λ=2). Find P(X=3). Round to 4 decimal places. [Formula: P = e^(−λ)·λ^x / x!]',
+    answer: '0.1804',
+    tolerance: 0.001,
+    explanation: 'P(X=3) = e^(-2) × 8 / 6 = 0.1353 × 1.333 ≈ 0.1804'
+  }
+];
+
+// ===================== CHEAT SHEET DATA =====================
+const cheatFormulas = [
+  { title: 'PMF Conditions', formula: 'f(x) ≥ 0\nΣ f(x) = 1', note: 'If sum ≠ 1 → invalid PMF. Find missing value by subtraction.' },
+  { title: 'CDF Definition', formula: 'F(x) = P(X ≤ x) = Σ_{t≤x} f(t)', note: 'CDF is non-decreasing. PMF = jump size at each value.' },
+  { title: 'Mean & Variance', formula: 'E(X) = Σ x·f(x)\nVar(X) = E(X²) − [E(X)]²', note: 'Shortcut for Var saves time vs summing (x−μ)² formula.' },
+  { title: 'Bernoulli', formula: 'P(X=1) = p,  P(X=0) = 1−p\nE(X) = p,  Var(X) = p(1−p)', note: 'Single trial only. Building block of Binomial.' },
+  { title: 'Binomial', formula: 'P(X=x) = C(n,x)·pˣ·(1−p)^(n−x)\nE(X) = np,  Var = np(1−p)', note: 'Requires: fixed n, independence, constant p, 2 outcomes.' },
+  { title: 'Geometric', formula: 'P(X=x) = (1−p)^(x−1)·p\nE(X) = 1/p,  Var = (1−p)/p²', note: 'Trials until first success. Memoryless property.' },
+  { title: 'Geometric — Memoryless', formula: 'P(X > s+t | X > s) = P(X > t)', note: 'Past failures don\'t matter. The process "resets".' },
+  { title: 'Poisson', formula: 'P(X=x) = e^(−λ)·λˣ / x!\nE(X) = Var(X) = λ', note: 'Scale λ to match interval length! Rare events, large n.' },
+  { title: 'Discrete Uniform', formula: 'f(x) = 1/(b−a+1)\nE(X) = (a+b)/2', note: 'Count values: b−a+1 (include both endpoints).' },
+  { title: 'Complement Trick', formula: 'P(X ≥ 1) = 1 − P(X=0)\nP(X ≥ k) = 1 − P(X ≤ k−1)', note: 'Use when summing many terms. Saves huge calculation effort.' },
+  { title: 'Interval Probability', formula: 'P(a ≤ X ≤ b) = F(b) − F(a−1)\nP(a < X ≤ b) = F(b) − F(a)', note: 'For discrete: be careful whether endpoints are included.' },
+  { title: 'Poisson Approximation', formula: 'When n large, p small:\nλ = np  →  Use Poisson', note: 'Rule of thumb: n ≥ 100, p ≤ 0.01. Much easier than Binomial.' },
+];
+
+const traps = [
+  { label: 'Without Replacement', text: 'Sampling without replacement violates independence and constant p → NOT Binomial. Use Hypergeometric.' },
+  { label: 'Missing Probability', text: 'If a PMF has an unknown value, set Σf(x) = 1 and solve. Very common MCQ trap.' },
+  { label: 'Scaling λ in Poisson', text: 'Always scale λ to match your target interval. Rate per mm × length in mm = λ for that segment.' },
+  { label: 'E(X²) vs [E(X)]²', text: 'E(X²) = Σ x²·f(x) — square x first. [E(X)]² = (Σ x·f(x))² — compute mean first, then square.' },
+  { label: 'Geometric X=0?', text: 'In the geometric distribution, X = number of trials. Minimum is X=1 (not 0). P(X=0) is undefined.' },
+  { label: 'Poisson: Mean = Variance', text: 'If a question says mean ≠ variance, it is NOT Poisson. Use this to eliminate wrong distribution choices.' },
+];
+
+// ===================== RENDER SUMMARY =====================
+function renderSummary() {
+  const grid = document.getElementById('concepts-grid');
+  grid.innerHTML = concepts.map((c, i) => `
+    <div class="concept-card">
+      <div class="concept-header" onclick="toggleConcept(${i})" id="ch-${i}">
+        <div class="concept-title-wrap">
+          <div class="concept-num">${c.num}</div>
+          <span class="concept-title">${c.title}</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px">
+          <span class="concept-badge ${c.importance === 'HIGHLY TESTED' || c.importance === 'EXAM TRAP' ? 'high' : ''}">${c.importance}</span>
+          <span class="concept-chevron">▾</span>
+        </div>
+      </div>
+      <div class="concept-body" id="cb-${i}">${c.body}</div>
+    </div>
+  `).join('');
+  toggleConcept(0);
+}
+
+function toggleConcept(i) {
+  const hdr = document.getElementById('ch-'+i);
+  const body = document.getElementById('cb-'+i);
+  const isOpen = body.classList.contains('open');
+  body.classList.toggle('open', !isOpen);
+  hdr.classList.toggle('open', !isOpen);
+}
+
+// ===================== RENDER EXAMPLES =====================
+function renderExamples() {
+  const cont = document.getElementById('examples-container');
+  cont.innerHTML = examples.map(ex => {
+    const tableHTML = ex.table ? `
+      <table class="prob-table">
+        <thead><tr>${ex.table.headers.map(h=>`<th>${h}</th>`).join('')}</tr></thead>
+        <tbody>${ex.table.rows.map(r=>`<tr>${r.map(c=>`<td>${c}</td>`).join('')}</tr>`).join('')}</tbody>
+      </table>` : '';
+
+    const stepsHTML = ex.steps.map((s, si) => `
+      <div class="step" id="step-${ex.id}-${si}">
+        <div class="step-question">Step ${si+1}: ${s.q}</div>
+        <div class="step-options">
+          ${s.opts.map((o,oi) => `
+            <button class="step-option" onclick="checkStep('${ex.id}',${si},${oi},${s.correct})">${o}</button>
+          `).join('')}
+        </div>
+        <div class="step-feedback" id="sfb-${ex.id}-${si}"></div>
+      </div>
+    `).join('');
+
+    return `
+      <div class="example-card">
+        <div class="example-header">
+          <span class="ex-num">${ex.num}</span>
+          <h3>${ex.title}</h3>
+        </div>
+        <div class="example-body">
+          <p>${ex.question}</p>
+          ${tableHTML}
+          <div class="steps-container">${stepsHTML}</div>
+          <button class="show-solution-btn" onclick="toggleSolution('${ex.id}')">Show Full Solution ▾</button>
+          <div class="full-solution" id="sol-${ex.id}">${ex.solution}</div>
+        </div>
+      </div>
+    `;
+  }).join('');
+
+  if (window.MathJax) MathJax.typesetPromise();
+}
+
+function checkStep(exId, stepIdx, chosen, correct) {
+  const stepEl = document.getElementById(`step-${exId}-${stepIdx}`);
+  const fbEl = document.getElementById(`sfb-${exId}-${stepIdx}`);
+  const ex = examples.find(e=>e.id===exId);
+  const step = ex.steps[stepIdx];
+  const btns = stepEl.querySelectorAll('.step-option');
+
+  btns.forEach(b => b.disabled = true);
+
+  const isCorrect = chosen === correct;
+  btns[chosen].classList.add(isCorrect ? 'selected-correct' : 'selected-wrong');
+  if (!isCorrect) btns[correct].classList.add('reveal-correct');
+
+  fbEl.textContent = isCorrect ? step.fb_correct : '✗ ' + step.fb_wrong;
+  fbEl.className = `step-feedback show ${isCorrect ? 'correct-fb' : 'wrong-fb'}`;
+  stepEl.classList.add(isCorrect ? 'correct' : 'wrong');
+}
+
+function toggleSolution(exId) {
+  const sol = document.getElementById('sol-'+exId);
+  sol.classList.toggle('show');
+  if (window.MathJax) MathJax.typesetPromise();
+}
+
+// ===================== RENDER MOCK =====================
+let mockAnswers = {};
+let timerInterval = null;
+let timeLeft = 25 * 60;
+let mockSubmitted = false;
+
+function renderMock() {
+  const cont = document.getElementById('mock-container');
+  const sections = { A: [], B: [], C: [] };
+  mockQuestions.forEach(q => sections[q.section].push(q));
+
+  let html = '';
+  for (const [sec, qs] of Object.entries(sections)) {
+    const labels = { A:'Section A — MCQs (Concepts & Identification)', B:'Section B — Solve (Core Problems)', C:'Section C — Calculation' };
+    html += `<div class="mock-section-title">${labels[sec]}</div>`;
+    qs.forEach((q) => {
+      const globalIdx = mockQuestions.indexOf(q) + 1;
+
+      if (q.type === 'mcq') {
+        html += `
+          <div class="mock-q" id="mq-${q.id}">
+            <div class="mock-q-num">Q${globalIdx}</div>
+            <div class="mock-q-text">${q.text}</div>
+            <div class="mock-opts">
+              ${q.opts.map((o,oi)=>`
+                <div class="mock-opt" id="mopt-${q.id}-${oi}" onclick="selectMockOpt('${q.id}',${oi})">
+                  <div class="opt-letter">${['A','B','C','D'][oi]}</div>
+                  <span>${o}</span>
+                </div>
+              `).join('')}
+            </div>
+            <div class="mock-q-feedback" id="mfb-${q.id}"></div>
+          </div>`;
+      } else {
+        html += `
+          <div class="mock-q" id="mq-${q.id}">
+            <div class="mock-q-num">Q${globalIdx}</div>
+            <div class="mock-q-text">${q.text}</div>
+            <div class="calc-input-wrap">
+              <input type="number" step="any" class="calc-input" id="calc-${q.id}" placeholder="Your answer">
+              <button class="calc-btn" onclick="checkCalc('${q.id}')">Check</button>
+            </div>
+            <div class="mock-q-feedback" id="mfb-${q.id}"></div>
+          </div>`;
+      }
+    });
+  }
+  cont.innerHTML = html;
+  updateMockProgress();
+}
+
+function selectMockOpt(qId, chosen) {
+  if (mockSubmitted) return;
+  const opts = document.querySelectorAll(`[id^="mopt-${qId}-"]`);
+  opts.forEach(o => o.classList.remove('selected'));
+  opts[chosen].classList.add('selected');
+  mockAnswers[qId] = chosen;
+  updateMockProgress();
+}
+
+function checkCalc(qId) {
+  if (mockSubmitted) return;
+  const val = parseFloat(document.getElementById('calc-'+qId).value);
+  mockAnswers[qId] = val;
+  updateMockProgress();
+}
+
+function updateMockProgress() {
+  const answered = Object.keys(mockAnswers).length;
+  document.getElementById('mock-progress').style.width = (answered/mockQuestions.length*100)+'%';
+}
+
+function submitMock() {
+  if (mockSubmitted) return;
+  mockSubmitted = true;
+  clearInterval(timerInterval);
+  document.getElementById('submit-btn').disabled = true;
+
+  let totalScore = 0, mcqScore = 0, calcScore = 0;
+
+  mockQuestions.forEach(q => {
+    const qEl = document.getElementById('mq-'+q.id);
+    const fbEl = document.getElementById('mfb-'+q.id);
+
+    if (q.type === 'mcq') {
+      const chosen = mockAnswers[q.id];
+      const correct = q.correct;
+      const opts = document.querySelectorAll(`[id^="mopt-${q.id}-"]`);
+      opts.forEach(o => { o.classList.add('disabled'); o.style.pointerEvents='none'; });
+
+      if (chosen !== undefined) {
+        const isCorrect = chosen === correct;
+        if (isCorrect) { totalScore++; mcqScore++; }
+        opts[chosen].classList.remove('selected');
+        opts[chosen].classList.add(isCorrect ? 'correct-ans' : 'wrong-ans');
+        opts[correct].classList.add('correct-ans');
+        qEl.classList.add(isCorrect ? 'answered-correct' : 'answered-wrong');
+        fbEl.textContent = (isCorrect ? '✓ Correct! ' : '✗ Incorrect. ') + q.explanation;
+        fbEl.className = `mock-q-feedback show ${isCorrect ? 'fb-correct' : 'fb-wrong'}`;
+      } else {
+        opts[correct].classList.add('correct-ans');
+        qEl.classList.add('answered-wrong');
+        fbEl.textContent = '— Not answered. Correct: ' + q.opts[correct] + '. ' + q.explanation;
+        fbEl.className = 'mock-q-feedback show fb-wrong';
+      }
+    } else {
+      const val = mockAnswers[q.id];
+      const expected = parseFloat(q.answer);
+      const isCorrect = val !== undefined && !isNaN(val) && Math.abs(val - expected) <= q.tolerance;
+      if (isCorrect) { totalScore++; calcScore++; }
+      const inp = document.getElementById('calc-'+q.id);
+      inp.disabled = true;
+      inp.style.borderColor = isCorrect ? 'var(--green)' : 'var(--red)';
+      qEl.classList.add(isCorrect ? 'answered-correct' : 'answered-wrong');
+      fbEl.textContent = (isCorrect ? '✓ Correct! ' : `✗ Expected ≈ ${q.answer}. `) + q.explanation;
+      fbEl.className = `mock-q-feedback show ${isCorrect ? 'fb-correct' : 'fb-wrong'}`;
+    }
+  });
+
+  const total = mockQuestions.length;
+  document.getElementById('results-score').textContent = `${totalScore}/${total}`;
+  document.getElementById('res-mcq').textContent = `${mcqScore}/10`;
+  document.getElementById('res-calc').textContent = `${calcScore}/2`;
+  document.getElementById('res-pct').textContent = `${Math.round(totalScore/total*100)}%`;
+  document.getElementById('results-panel').classList.add('show');
+  document.getElementById('results-panel').scrollIntoView({behavior:'smooth', block:'center'});
+}
+
+function resetMock() {
+  mockAnswers = {};
+  mockSubmitted = false;
+  timeLeft = 25 * 60;
+  document.getElementById('submit-btn').disabled = false;
+  document.getElementById('results-panel').classList.remove('show');
+  renderMock();
+  startTimer();
+}
+
+function startTimer() {
+  clearInterval(timerInterval);
+  timerInterval = setInterval(() => {
+    timeLeft--;
+    const m = Math.floor(timeLeft/60).toString().padStart(2,'0');
+    const s = (timeLeft%60).toString().padStart(2,'0');
+    document.getElementById('timer-display').textContent = `${m}:${s}`;
+    if (timeLeft <= 0) { clearInterval(timerInterval); submitMock(); }
+    if (timeLeft <= 300) document.getElementById('timer-display').style.color = '#ef4444';
+  }, 1000);
+}
+
+// ===================== RENDER CHEAT SHEET =====================
+function renderCheatSheet() {
+  document.getElementById('cheat-grid').innerHTML = cheatFormulas.map(f => `
+    <div class="cheat-card">
+      <h4>${f.title}</h4>
+      <div class="formula">${f.formula.replace(/\n/g,'<br>')}</div>
+      <div class="note">💡 ${f.note}</div>
+    </div>
+  `).join('');
+
+  document.getElementById('trap-list').innerHTML = traps.map(t => `
+    <li><strong>⚠️ ${t.label}</strong>${t.text}</li>
+  `).join('');
+}
+
+// ===================== TAB SWITCHING =====================
+function switchTab(name) {
+  document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(el => el.classList.remove('active'));
+  document.getElementById('tab-'+name).classList.add('active');
+  const tabs = ['summary','examples','mock','cheatsheet'];
+  document.querySelectorAll('.nav-tab')[tabs.indexOf(name)].classList.add('active');
+
+  if (name === 'mock' && !timerInterval) startTimer();
+  if (window.MathJax) MathJax.typesetPromise();
+}
+
+// ===================== INIT =====================
+renderSummary();
+renderExamples();
+renderMock();
+renderCheatSheet();
+if (window.MathJax) MathJax.typesetPromise();
+</script>
+</body>
+</html>
