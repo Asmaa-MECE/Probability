@@ -1,0 +1,1392 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-TP9KT7RKVV"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-TP9KT7RKVV');
+</script>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Chapter 7 — Point Estimation & Sampling Distributions</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-chtml.min.js" crossorigin="anonymous"></script>
+<style>
+  :root {
+    --gold: #F2B418;
+    --ice: #ECF8FD;
+    --steel: #AFCBD5;
+    --navy: #272838;
+    --clay: #815355;
+    --white: #FFFFFF;
+    --text: #1a1a2e;
+    --muted: #6b7280;
+    --green: #16a34a;
+    --green-bg: #dcfce7;
+    --red: #dc2626;
+    --red-bg: #fee2e2;
+    --yellow-bg: #fef9c3;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--ice);
+    color: var(--text);
+  }
+
+  /* NAV */
+  nav {
+    position: sticky; top: 0; z-index: 100;
+    background: var(--navy);
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 14px 32px;
+    box-shadow: 0 2px 16px rgba(39,40,56,0.25);
+  }
+  .nav-left { display: flex; align-items: center; gap: 16px; }
+  .nav-back {
+    color: var(--steel); text-decoration: none; font-size: 0.85rem;
+    display: flex; align-items: center; gap: 6px;
+    transition: color 0.2s;
+  }
+  .nav-back:hover { color: var(--gold); }
+  .nav-title { color: var(--white); font-weight: 600; font-size: 0.95rem; }
+  .nav-tabs { display: flex; gap: 4px; }
+  .nav-tab {
+    background: transparent; border: none; cursor: pointer;
+    color: var(--steel); font-size: 0.82rem; font-family: 'DM Sans', sans-serif;
+    padding: 7px 14px; border-radius: 20px; transition: all 0.2s;
+  }
+  .nav-tab:hover { background: rgba(255,255,255,0.08); color: var(--white); }
+  .nav-tab.active { background: var(--gold); color: var(--navy); font-weight: 600; }
+
+  /* HERO */
+  .hero {
+    background: linear-gradient(135deg, var(--navy) 0%, #1e2035 100%);
+    padding: 56px 32px 48px;
+    position: relative; overflow: hidden;
+  }
+  .hero::before {
+    content: '7'; position: absolute; right: 40px; top: 50%;
+    transform: translateY(-50%);
+    font-family: 'Playfair Display', serif;
+    font-size: 200px; color: rgba(255,255,255,0.04);
+    line-height: 1; user-select: none;
+  }
+  .hero-inner { max-width: 900px; margin: 0 auto; position: relative; z-index: 1; }
+  .hero-tag {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: rgba(242,180,24,0.15); border: 1px solid rgba(242,180,24,0.3);
+    color: var(--gold); font-size: 11px; font-weight: 700;
+    letter-spacing: 2px; text-transform: uppercase;
+    padding: 5px 14px; border-radius: 20px; margin-bottom: 20px;
+  }
+  .hero h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(1.8rem, 4vw, 2.8rem);
+    color: var(--white); line-height: 1.2; margin-bottom: 14px;
+  }
+  .hero h1 em { color: var(--gold); font-style: normal; }
+  .hero p { color: var(--steel); font-size: 0.97rem; font-weight: 300; line-height: 1.7; max-width: 560px; }
+  .hero-pills { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 24px; }
+  .hero-pill {
+    background: rgba(175,203,213,0.12); border: 1px solid rgba(175,203,213,0.25);
+    color: var(--steel); font-size: 0.78rem; padding: 5px 12px; border-radius: 14px;
+  }
+
+  /* CONTENT */
+  .content { max-width: 900px; margin: 0 auto; padding: 48px 24px; }
+
+  /* TABS CONTENT */
+  .tab-content { display: none; }
+  .tab-content.active { display: block; }
+
+  /* SUMMARY SECTIONS */
+  .summary-grid { display: grid; gap: 16px; }
+
+  .concept-card {
+    background: var(--white);
+    border-radius: 14px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(39,40,56,0.06);
+  }
+  .concept-header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 18px 24px;
+    cursor: pointer;
+    border-bottom: 1px solid transparent;
+    transition: background 0.2s;
+    user-select: none;
+  }
+  .concept-header:hover { background: var(--ice); }
+  .concept-header.open { border-bottom-color: rgba(175,203,213,0.3); }
+  .concept-title-wrap { display: flex; align-items: center; gap: 14px; }
+  .concept-num {
+    width: 32px; height: 32px; border-radius: 8px;
+    background: var(--gold); color: var(--navy);
+    font-size: 0.8rem; font-weight: 700;
+    display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+  }
+  .concept-title { font-weight: 600; font-size: 0.97rem; color: var(--navy); }
+  .concept-badge {
+    font-size: 10px; font-weight: 700; letter-spacing: 1px;
+    text-transform: uppercase; padding: 3px 8px; border-radius: 10px;
+    background: #fef3c7; color: #92400e;
+  }
+  .concept-badge.high { background: #fee2e2; color: #991b1b; }
+  .concept-chevron { color: var(--muted); transition: transform 0.3s; font-size: 0.9rem; }
+  .concept-header.open .concept-chevron { transform: rotate(180deg); }
+  .concept-body {
+    display: none;
+    padding: 20px 24px 24px;
+  }
+  .concept-body.open { display: block; }
+  .concept-body p { font-size: 0.9rem; line-height: 1.75; color: #374151; margin-bottom: 12px; }
+  .concept-body p:last-child { margin-bottom: 0; }
+
+  .formula-box {
+    background: var(--ice);
+    border-left: 4px solid var(--gold);
+    border-radius: 0 10px 10px 0;
+    padding: 14px 18px;
+    margin: 14px 0;
+    font-size: 0.9rem;
+  }
+  .trap-box {
+    background: #fff7ed;
+    border: 1px solid #fed7aa;
+    border-radius: 10px;
+    padding: 14px 18px;
+    margin-top: 14px;
+    font-size: 0.85rem;
+    color: #7c2d12;
+  }
+  .trap-box strong { display: block; margin-bottom: 4px; color: #c2410c; }
+
+  /* EXAMPLES */
+  .example-card {
+    background: var(--white);
+    border-radius: 16px;
+    overflow: hidden;
+    margin-bottom: 24px;
+    box-shadow: 0 2px 10px rgba(39,40,56,0.07);
+  }
+  .example-header {
+    background: var(--navy);
+    padding: 18px 28px;
+    display: flex; align-items: center; gap: 16px;
+  }
+  .ex-num {
+    background: var(--gold); color: var(--navy);
+    font-weight: 800; font-size: 0.8rem;
+    padding: 4px 10px; border-radius: 8px;
+  }
+  .example-header h3 { color: var(--white); font-size: 1rem; font-weight: 600; }
+  .example-body { padding: 24px 28px; }
+  .example-body p { font-size: 0.9rem; line-height: 1.7; color: #374151; margin-bottom: 12px; }
+
+  .prob-table {
+    width: 100%; border-collapse: collapse;
+    margin: 16px 0; font-size: 0.85rem;
+    border-radius: 10px; overflow: hidden;
+  }
+  .prob-table th {
+    background: var(--navy); color: var(--white);
+    padding: 10px 14px; text-align: center; font-weight: 600;
+  }
+  .prob-table td {
+    padding: 9px 14px; text-align: center;
+    border-bottom: 1px solid rgba(175,203,213,0.3);
+  }
+  .prob-table tr:nth-child(even) td { background: var(--ice); }
+  .prob-table td:first-child { font-weight: 600; color: var(--navy); background: #f8fafc; }
+
+  /* INTERACTIVE STEPS */
+  .steps-container { margin-top: 20px; }
+  .step {
+    border: 2px solid rgba(175,203,213,0.4);
+    border-radius: 12px;
+    padding: 16px 20px;
+    margin-bottom: 14px;
+    transition: border-color 0.3s;
+  }
+  .step.correct { border-color: var(--green); background: var(--green-bg); }
+  .step.wrong { border-color: var(--red); background: var(--red-bg); }
+  .step-question { font-size: 0.88rem; font-weight: 600; color: var(--navy); margin-bottom: 12px; }
+  .step-options { display: flex; flex-wrap: wrap; gap: 8px; }
+  .step-option {
+    background: var(--ice); border: 2px solid rgba(175,203,213,0.5);
+    border-radius: 8px; padding: 8px 16px; font-size: 0.85rem;
+    cursor: pointer; transition: all 0.2s; font-family: 'DM Sans', sans-serif;
+    color: var(--text);
+  }
+  .step-option:hover:not(:disabled) { border-color: var(--gold); background: #fffbeb; }
+  .step-option.selected-correct { background: var(--green-bg); border-color: var(--green); color: var(--green); font-weight: 600; }
+  .step-option.selected-wrong { background: var(--red-bg); border-color: var(--red); color: var(--red); font-weight: 600; }
+  .step-option.reveal-correct { background: var(--green-bg); border-color: var(--green); color: var(--green); }
+  .step-option:disabled { cursor: not-allowed; opacity: 0.7; }
+  .step-feedback {
+    margin-top: 10px; font-size: 0.84rem; line-height: 1.6;
+    display: none; padding: 10px 14px; border-radius: 8px;
+  }
+  .step-feedback.show { display: block; }
+  .step-feedback.correct-fb { background: #f0fdf4; color: #166534; }
+  .step-feedback.wrong-fb { background: #fff1f2; color: #991b1b; }
+
+  .show-solution-btn {
+    display: block; width: 100%; margin-top: 20px;
+    background: var(--navy); color: var(--white);
+    border: none; border-radius: 10px; padding: 12px;
+    font-size: 0.88rem; font-weight: 600; font-family: 'DM Sans', sans-serif;
+    cursor: pointer; transition: background 0.2s;
+  }
+  .show-solution-btn:hover { background: var(--clay); }
+  .full-solution {
+    display: none; margin-top: 16px;
+    background: #f8fafc; border-radius: 10px;
+    padding: 18px 20px; border-left: 4px solid var(--gold);
+  }
+  .full-solution.show { display: block; }
+  .full-solution h4 { font-size: 0.88rem; color: var(--navy); margin-bottom: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; }
+  .full-solution p { font-size: 0.87rem; line-height: 1.75; color: #374151; }
+
+  /* MOCK TEST */
+  .mock-header {
+    background: var(--navy); border-radius: 16px;
+    padding: 28px 32px; margin-bottom: 28px;
+    display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px;
+  }
+  .mock-header h2 { font-family: 'Playfair Display', serif; color: var(--white); font-size: 1.5rem; }
+  .mock-header p { color: var(--steel); font-size: 0.85rem; margin-top: 4px; }
+  .mock-timer {
+    background: rgba(242,180,24,0.15); border: 1px solid var(--gold);
+    border-radius: 10px; padding: 12px 20px; text-align: center;
+  }
+  .mock-timer .timer-val { font-family: 'Playfair Display', serif; font-size: 2rem; color: var(--gold); }
+  .mock-timer .timer-label { font-size: 0.75rem; color: var(--steel); letter-spacing: 1px; }
+
+  .mock-section-title {
+    font-size: 11px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase;
+    color: var(--clay); margin: 32px 0 16px; display: flex; align-items: center; gap: 10px;
+  }
+  .mock-section-title::after { content: ''; flex: 1; height: 1px; background: rgba(175,203,213,0.5); }
+
+  .mock-q {
+    background: var(--white); border-radius: 14px; padding: 22px 26px;
+    margin-bottom: 16px; box-shadow: 0 2px 8px rgba(39,40,56,0.05);
+    border: 2px solid transparent; transition: border-color 0.3s;
+  }
+  .mock-q.answered-correct { border-color: var(--green); }
+  .mock-q.answered-wrong { border-color: var(--red); }
+  .mock-q-num { font-size: 11px; font-weight: 700; color: var(--gold); letter-spacing: 1px; margin-bottom: 8px; }
+  .mock-q-text { font-size: 0.92rem; color: var(--navy); font-weight: 500; line-height: 1.6; margin-bottom: 16px; }
+  .mock-opts { display: flex; flex-direction: column; gap: 8px; }
+  .mock-opt {
+    display: flex; align-items: center; gap: 12px;
+    padding: 11px 16px; border-radius: 10px;
+    border: 1.5px solid rgba(175,203,213,0.4);
+    cursor: pointer; transition: all 0.2s;
+    font-size: 0.88rem; background: var(--ice);
+  }
+  .mock-opt:hover:not(.disabled) { border-color: var(--gold); background: #fffbeb; }
+  .mock-opt.selected { border-color: var(--navy); background: #f0f4ff; font-weight: 500; }
+  .mock-opt.correct-ans { border-color: var(--green); background: var(--green-bg); color: var(--green); font-weight: 600; }
+  .mock-opt.wrong-ans { border-color: var(--red); background: var(--red-bg); color: var(--red); }
+  .mock-opt.disabled { cursor: not-allowed; }
+  .opt-letter {
+    width: 26px; height: 26px; border-radius: 6px;
+    background: rgba(175,203,213,0.3); color: var(--navy);
+    font-weight: 700; font-size: 0.78rem;
+    display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+  }
+  .mock-opt.correct-ans .opt-letter { background: var(--green); color: white; }
+  .mock-opt.wrong-ans .opt-letter { background: var(--red); color: white; }
+  .mock-q-feedback { font-size: 0.82rem; margin-top: 12px; padding: 10px 14px; border-radius: 8px; display: none; }
+  .mock-q-feedback.show { display: block; }
+  .mock-q-feedback.fb-correct { background: #f0fdf4; color: #166534; }
+  .mock-q-feedback.fb-wrong { background: #fff1f2; color: #991b1b; }
+
+  /* Calc question */
+  .calc-input-wrap { display: flex; gap: 10px; align-items: center; margin-top: 12px; flex-wrap: wrap; }
+  .calc-input {
+    padding: 10px 14px; border: 1.5px solid rgba(175,203,213,0.4);
+    border-radius: 10px; font-family: 'DM Sans', sans-serif; font-size: 0.9rem;
+    background: var(--ice); color: var(--text); width: 130px;
+    transition: border-color 0.2s;
+  }
+  .calc-input:focus { outline: none; border-color: var(--gold); }
+  .calc-btn {
+    padding: 10px 20px; background: var(--gold); color: var(--navy);
+    border: none; border-radius: 10px; font-weight: 700; font-size: 0.85rem;
+    cursor: pointer; font-family: 'DM Sans', sans-serif; transition: opacity 0.2s;
+  }
+  .calc-btn:hover { opacity: 0.85; }
+
+  /* RESULTS */
+  .results-panel {
+    display: none; background: var(--navy); border-radius: 16px;
+    padding: 36px; margin-top: 32px; text-align: center;
+  }
+  .results-panel.show { display: block; }
+  .results-score {
+    font-family: 'Playfair Display', serif; font-size: 4rem;
+    color: var(--gold); line-height: 1;
+  }
+  .results-label { color: var(--steel); font-size: 0.9rem; margin-top: 6px; margin-bottom: 24px; }
+  .results-bars { display: flex; gap: 24px; justify-content: center; flex-wrap: wrap; margin-bottom: 24px; }
+  .result-stat { text-align: center; }
+  .result-stat .val { font-size: 1.6rem; font-weight: 700; color: var(--white); }
+  .result-stat .lbl { font-size: 0.78rem; color: var(--steel); margin-top: 2px; }
+  .retry-btn {
+    background: var(--gold); color: var(--navy); border: none;
+    padding: 12px 32px; border-radius: 30px; font-weight: 700;
+    font-size: 0.95rem; cursor: pointer; font-family: 'DM Sans', sans-serif;
+    transition: opacity 0.2s;
+  }
+  .retry-btn:hover { opacity: 0.85; }
+
+  .submit-wrap { margin-top: 32px; text-align: center; }
+  .submit-btn {
+    background: var(--gold); color: var(--navy);
+    border: none; border-radius: 30px; padding: 14px 48px;
+    font-size: 1rem; font-weight: 700; cursor: pointer;
+    font-family: 'DM Sans', sans-serif;
+    box-shadow: 0 4px 16px rgba(242,180,24,0.35);
+    transition: all 0.2s;
+  }
+  .submit-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(242,180,24,0.4); }
+  .submit-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+  /* PROGRESS */
+  .progress-bar-wrap { height: 4px; background: rgba(175,203,213,0.3); border-radius: 2px; margin-bottom: 32px; }
+  .progress-bar { height: 4px; background: var(--gold); border-radius: 2px; transition: width 0.4s; }
+
+  /* CHEAT SHEET */
+  .cheat-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 14px; }
+  .cheat-card {
+    background: var(--white); border-radius: 12px; padding: 20px 22px;
+    border-top: 4px solid var(--gold);
+    box-shadow: 0 2px 8px rgba(39,40,56,0.05);
+  }
+  .cheat-card h4 { font-size: 0.88rem; font-weight: 700; color: var(--navy); margin-bottom: 10px; }
+  .cheat-card .formula { font-size: 0.85rem; color: #374151; line-height: 1.8; }
+  .cheat-card .note { font-size: 0.78rem; color: var(--muted); margin-top: 8px; line-height: 1.6; }
+
+  .trap-list { list-style: none; display: flex; flex-direction: column; gap: 8px; margin-top: 24px; }
+  .trap-list li {
+    background: #fff7ed; border-radius: 10px; padding: 12px 16px;
+    font-size: 0.85rem; color: #7c2d12; border-left: 4px solid #f97316;
+  }
+  .trap-list li strong { display: block; color: #c2410c; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 2px; }
+
+  /* Utility */
+  .section-label {
+    font-size: 11px; font-weight: 700; letter-spacing: 2px;
+    text-transform: uppercase; color: var(--muted); margin-bottom: 20px;
+    display: flex; align-items: center; gap: 10px;
+  }
+  .section-label::after { content: ''; flex: 1; height: 1px; background: rgba(175,203,213,0.4); }
+
+  @media (max-width: 600px) {
+    nav { flex-direction: column; align-items: flex-start; gap: 10px; }
+    .nav-tabs { width: 100%; overflow-x: auto; }
+    .hero { padding: 36px 20px 32px; }
+    .hero::before { display: none; }
+    .content { padding: 28px 16px; }
+    .example-header { padding: 14px 18px; }
+    .example-body { padding: 16px 18px; }
+    .mock-header { flex-direction: column; }
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-left">
+    <a href="../index.html" class="nav-back">← All Chapters</a>
+    <span style="color:rgba(255,255,255,0.2)">|</span>
+    <span class="nav-title">Chapter 7</span>
+  </div>
+  <div class="nav-tabs">
+    <button class="nav-tab active" onclick="switchTab('summary')">📖 Summary</button>
+    <button class="nav-tab" onclick="switchTab('examples')">🧮 Examples</button>
+    <button class="nav-tab" onclick="switchTab('mock')">🧪 Mock Test</button>
+    <button class="nav-tab" onclick="switchTab('cheatsheet')">⚡ Cheat Sheet</button>
+  </div>
+</nav>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-inner">
+    <div class="hero-tag">Chapter 7</div>
+    <h1>Point Estimation &<br><em>Sampling Distributions</em></h1>
+    <p>Statistical inference, random samples, estimators, CLT, standard error, unbiasedness, MSE, and method of moments.</p>
+    <div class="hero-pills">
+      <span class="hero-pill">12 Concepts</span>
+      <span class="hero-pill">8 Worked Examples</span>
+      <span class="hero-pill">12-Question Mock Test</span>
+    </div>
+  </div>
+</div>
+
+<div class="content">
+
+<!-- ===== SUMMARY TAB ===== -->
+<div id="tab-summary" class="tab-content active">
+  <p class="section-label">Core Concepts</p>
+  <div class="summary-grid" id="concepts-grid"></div>
+</div>
+
+<!-- ===== EXAMPLES TAB ===== -->
+<div id="tab-examples" class="tab-content">
+  <p class="section-label">Worked Examples — Try Each Step Before Revealing</p>
+  <div id="examples-container"></div>
+</div>
+
+<!-- ===== MOCK TEST TAB ===== -->
+<div id="tab-mock" class="tab-content">
+  <div class="mock-header">
+    <div>
+      <h2>Mock Exam</h2>
+      <p>12 questions · Sections A, B &amp; C · Auto-graded with explanations</p>
+    </div>
+    <div class="mock-timer">
+      <div class="timer-val" id="timer-display">25:00</div>
+      <div class="timer-label">REMAINING</div>
+    </div>
+  </div>
+  <div class="progress-bar-wrap"><div class="progress-bar" id="mock-progress" style="width:0%"></div></div>
+  <div id="mock-container"></div>
+  <div class="submit-wrap">
+    <button class="submit-btn" id="submit-btn" onclick="submitMock()">Submit Exam</button>
+  </div>
+  <div class="results-panel" id="results-panel">
+    <div class="results-score" id="results-score">0/12</div>
+    <div class="results-label">Total Score</div>
+    <div class="results-bars">
+      <div class="result-stat"><div class="val" id="res-mcq">0/9</div><div class="lbl">Section A &amp; B · MCQ</div></div>
+      <div class="result-stat"><div class="val" id="res-calc">0/3</div><div class="lbl">Section C · Calc</div></div>
+      <div class="result-stat"><div class="val" id="res-pct">0%</div><div class="lbl">Percentage</div></div>
+    </div>
+    <button class="retry-btn" onclick="resetMock()">Retry Test</button>
+  </div>
+</div>
+
+<!-- ===== CHEAT SHEET TAB ===== -->
+<div id="tab-cheatsheet" class="tab-content">
+  <p class="section-label">Formula Reference</p>
+  <div class="cheat-grid" id="cheat-grid"></div>
+  <p class="section-label" style="margin-top:36px">Common Exam Traps</p>
+  <ul class="trap-list" id="trap-list"></ul>
+</div>
+
+</div><!-- end .content -->
+
+<script>
+// ===================== CONCEPTS DATA =====================
+const concepts = [
+  {
+    num: '01', title: 'Statistical Inference',
+    importance: 'FOUNDATION',
+    body: `<p><strong>Statistical inference</strong> is the process of using sample data to draw conclusions about an unknown population parameter. We can never observe the whole population — so we use a sample to make decisions.</p>
+    <div class="formula-box">
+      <strong>Example:</strong><br>
+      Population mean strength: μ = 300 MPa (unknown)<br>
+      Sample mean: x̄ = 298.8 MPa (observed)<br><br>
+      Question: Is the true mean really 300 MPa?
+    </div>
+    <p>💡 This chapter focuses on <strong>point estimation</strong> — using one number to estimate a population parameter.</p>`
+  },
+  {
+    num: '02', title: 'Random Sample & i.i.d.',
+    importance: 'KEY',
+    body: `<p>A sample X₁, X₂, …, Xₙ is a <strong>random sample</strong> if all observations are:</p>
+    <div class="formula-box">
+      <strong>1. Independent</strong> — the value of one observation does not affect any other.<br><br>
+      <strong>2. Identically distributed (i.d.)</strong> — all drawn from the same population distribution.
+    </div>
+    <p>Together these properties are called <strong>i.i.d.</strong> (independent and identically distributed). Most formulas in this chapter assume i.i.d. data.</p>
+    <div class="trap-box"><strong>⚠️ Exam Trap</strong> Sampling without replacement from a finite population violates independence — observations are NOT i.i.d. in that case.</div>`
+  },
+  {
+    num: '03', title: 'Statistic vs Parameter',
+    importance: 'HIGHLY TESTED',
+    body: `<p>This distinction is tested constantly. Get it right every time.</p>
+    <div class="formula-box">
+      <strong>Parameter (θ)</strong> — a fixed (but unknown) characteristic of the <em>population</em>.<br>
+      Examples: μ (population mean), σ² (population variance), p (population proportion)<br><br>
+      <strong>Statistic</strong> — a value computed from the <em>sample</em>. It is known once we have data.<br>
+      Examples: x̄ (sample mean), S² (sample variance)
+    </div>
+    <div class="trap-box"><strong>⚠️ Key Rule</strong> Parameters are fixed but unknown. Statistics are random — they vary from sample to sample. A statistic is used to estimate a parameter.</div>`
+  },
+  {
+    num: '04', title: 'Point Estimator',
+    importance: 'KEY',
+    body: `<p>A <strong>point estimator</strong> is a function of the sample data that produces a single number as an estimate of a population parameter.</p>
+    <div class="formula-box">
+      \\( \\hat{\\theta} = h(X_1, X_2, \\ldots, X_n) \\)<br><br>
+      <strong>Examples:</strong><br>
+      \\( \\hat{\\mu} = \\bar{X} \\) — estimates the population mean<br>
+      \\( \\hat{\\sigma}^2 = S^2 \\) — estimates the population variance
+    </div>
+    <p>⚠️ Since X₁, …, Xₙ are random variables, the estimator \\( \\hat{\\theta} \\) is also a <strong>random variable</strong> — it has its own distribution, called the <strong>sampling distribution</strong>.</p>`
+  },
+  {
+    num: '05', title: 'Sampling Distribution of x̄',
+    importance: 'VERY IMPORTANT',
+    body: `<p>If we take many random samples and compute x̄ each time, these x̄ values form a distribution — the <strong>sampling distribution of the mean</strong>.</p>
+    <div class="formula-box">
+      <strong>If population is Normal(μ, σ²):</strong><br>
+      \\( \\bar{X} \\sim N\\!\\left(\\mu,\\; \\dfrac{\\sigma^2}{n}\\right) \\)<br><br>
+      <strong>Key Results:</strong><br>
+      \\( E(\\bar{X}) = \\mu \\)<br>
+      \\( Var(\\bar{X}) = \\dfrac{\\sigma^2}{n} \\)
+    </div>
+    <p>💡 As n increases, the variance of x̄ <strong>shrinks</strong> — larger samples give more precise estimates.</p>`
+  },
+  {
+    num: '06', title: 'Central Limit Theorem (CLT)',
+    importance: 'EXAM TRAP',
+    body: `<p>The most powerful result in statistics: even if the population is NOT normal, the sample mean becomes approximately normal for large n.</p>
+    <div class="formula-box">
+      <strong>CLT Statement:</strong><br>
+      For large n, regardless of the population distribution:<br>
+      \\( \\bar{X} \\approx N\\!\\left(\\mu,\\; \\dfrac{\\sigma^2}{n}\\right) \\)
+    </div>
+    <p><strong>When is n "large enough"?</strong></p>
+    <ul style="font-size:0.88rem;line-height:1.9;padding-left:18px;color:#374151">
+      <li>If population is <strong>nearly symmetric</strong> → small n (even n = 5–10) may suffice</li>
+      <li>If population is <strong>heavily skewed</strong> → need larger n</li>
+      <li><strong>Rule of thumb: n &gt; 30</strong></li>
+    </ul>
+    <div class="trap-box"><strong>⚠️ Critical Distinction</strong> The CLT applies to the distribution of x̄, NOT to individual observations. Individual data may still be skewed even when n is large.</div>`
+  },
+  {
+    num: '07', title: 'Standard Error',
+    importance: 'KEY',
+    body: `<p>The <strong>standard error (SE)</strong> is the standard deviation of the sampling distribution of x̄. It measures how precise our estimate is.</p>
+    <div class="formula-box">
+      <strong>When σ is known:</strong><br>
+      \\( SE(\\bar{X}) = \\dfrac{\\sigma}{\\sqrt{n}} \\)<br><br>
+      <strong>When σ is unknown (estimated by s):</strong><br>
+      \\( SE(\\bar{X}) \\approx \\dfrac{s}{\\sqrt{n}} \\)
+    </div>
+    <p>✅ Interpretation: SE tells you the typical distance between x̄ and the true μ. Smaller SE = more accurate estimate.</p>
+    <div class="trap-box"><strong>⚠️ SE vs SD</strong> Standard deviation (s or σ) measures spread of individual data values. Standard error measures spread of the sample mean. They are NOT the same thing.</div>`
+  },
+  {
+    num: '08', title: 'Unbiased Estimator',
+    importance: 'VERY IMPORTANT',
+    body: `<p>An estimator \\( \\hat{\\theta} \\) is <strong>unbiased</strong> if its expected value equals the true parameter — on average, it neither overshoots nor undershoots.</p>
+    <div class="formula-box">
+      <strong>Definition:</strong><br>
+      \\( E(\\hat{\\theta}) = \\theta \\)<br><br>
+      <strong>Key results you must know:</strong><br>
+      \\( E(\\bar{X}) = \\mu \\) → x̄ is unbiased for μ<br>
+      \\( E(S^2) = \\sigma^2 \\) → S² is unbiased for σ²
+    </div>
+    <div class="trap-box"><strong>⚠️ Why S² uses n−1</strong> If we divided by n instead of n−1, E(S²) would be (n−1)σ²/n ≠ σ² — that would be a biased estimator. The n−1 correction makes S² unbiased.</div>`
+  },
+  {
+    num: '09', title: 'Variance of an Estimator',
+    importance: 'STANDARD',
+    body: `<p>Even among unbiased estimators, some are better than others. The one with the <strong>smaller variance</strong> is preferred — it is more consistent across repeated samples.</p>
+    <div class="formula-box">
+      If two estimators both satisfy \\( E(\\hat{\\theta}_1) = E(\\hat{\\theta}_2) = \\theta \\),<br>
+      then prefer \\( \\hat{\\theta}_1 \\) if \\( Var(\\hat{\\theta}_1) < Var(\\hat{\\theta}_2) \\).
+    </div>
+    <p>💡 For estimating μ from a normal population, x̄ has the smallest variance among all unbiased estimators — it is the <strong>minimum variance unbiased estimator (MVUE)</strong>.</p>`
+  },
+  {
+    num: '10', title: 'Mean Squared Error (MSE)',
+    importance: 'HIGHLY TESTED',
+    body: `<p>MSE is a combined measure of an estimator's accuracy. It penalizes both high variance and bias.</p>
+    <div class="formula-box">
+      \\( MSE(\\hat{\\theta}) = Var(\\hat{\\theta}) + [Bias(\\hat{\\theta})]^2 \\)<br><br>
+      where \\( Bias(\\hat{\\theta}) = E(\\hat{\\theta}) - \\theta \\)
+    </div>
+    <p>✅ If the estimator is unbiased: Bias = 0, so MSE = Variance only.</p>
+    <ul style="font-size:0.88rem;line-height:1.9;padding-left:18px;color:#374151">
+      <li><strong>Lower MSE = better estimator</strong></li>
+      <li>A biased estimator can sometimes have lower MSE if its variance is much smaller</li>
+    </ul>`
+  },
+  {
+    num: '11', title: 'Method of Moments',
+    importance: 'KEY',
+    body: `<p>A systematic approach to finding estimators: equate <strong>population moments</strong> (in terms of θ) to <strong>sample moments</strong>, then solve for θ.</p>
+    <div class="formula-box">
+      <strong>Step 1:</strong> Write E(X) (and E(X²) if needed) in terms of unknown parameters.<br>
+      <strong>Step 2:</strong> Set equal to sample moments: \\( \\bar{X} \\) and \\( \\frac{1}{n}\\sum X_i^2 \\)<br>
+      <strong>Step 3:</strong> Solve for \\( \\hat{\\theta} \\)
+    </div>
+    <div class="formula-box">
+      <strong>Common Results:</strong><br>
+      Exponential: \\( \\hat{\\lambda} = 1/\\bar{X} \\)<br>
+      Normal: \\( \\hat{\\mu} = \\bar{X},\\quad \\hat{\\sigma}^2 = \\frac{1}{n}\\sum X_i^2 - \\bar{X}^2 \\)
+    </div>`
+  },
+  {
+    num: '12', title: 'Effect of Sample Size',
+    importance: 'EXAM TRAP',
+    body: `<p>Understanding how n affects every quantity is a common MCQ trap. Know this table completely.</p>
+    <div class="formula-box">
+      <table style="width:100%;font-size:0.85rem;border-collapse:collapse">
+        <thead><tr style="background:rgba(175,203,213,0.3)"><th style="padding:8px;text-align:left">Quantity</th><th style="padding:8px;text-align:center">As n increases</th></tr></thead>
+        <tbody>
+          <tr><td style="padding:8px;font-weight:600">Var(x̄) = σ²/n</td><td style="padding:8px;text-align:center">↓ Decreases</td></tr>
+          <tr style="background:rgba(175,203,213,0.1)"><td style="padding:8px;font-weight:600">SE = σ/√n</td><td style="padding:8px;text-align:center">↓ Decreases</td></tr>
+          <tr><td style="padding:8px;font-weight:600">Bias of x̄</td><td style="padding:8px;text-align:center">= 0 always</td></tr>
+          <tr style="background:rgba(175,203,213,0.1)"><td style="padding:8px;font-weight:600">MSE of x̄</td><td style="padding:8px;text-align:center">↓ Decreases</td></tr>
+          <tr><td style="padding:8px;font-weight:600">Accuracy of estimate</td><td style="padding:8px;text-align:center">↑ Improves</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="trap-box"><strong>⚠️ Never say</strong> "larger n increases variance" — it is the opposite. Var(x̄) = σ²/n shrinks as n grows.</div>`
+  },
+];
+
+// ===================== EXAMPLES DATA =====================
+const examples = [
+  {
+    id: 'ex71', num: 'Ex 7.1', title: 'Sampling Distribution — Resistors',
+    question: `A factory produces resistors with population mean μ = 100 Ω and standard deviation σ = 10 Ω. A random sample of n = 25 resistors is taken.
+    <br><br>(a) What is the standard error of x̄? &nbsp; (b) Find P(x̄ &lt; 95).`,
+    steps: [
+      {
+        q: 'What is the formula for the standard error of x̄?',
+        opts: ['σ × √n', 'σ / √n', 'σ² / n', 'σ / n'],
+        correct: 1,
+        fb_correct: '✓ SE = σ / √n. This is the standard deviation of the sampling distribution of x̄.',
+        fb_wrong: 'SE = σ / √n. The standard error shrinks as sample size grows.'
+      },
+      {
+        q: 'Calculate SE = 10 / √25:',
+        opts: ['0.4', '2', '4', '10'],
+        correct: 1,
+        fb_correct: '✓ SE = 10 / √25 = 10 / 5 = 2 Ω',
+        fb_wrong: 'SE = 10 / √25 = 10 / 5 = 2'
+      },
+      {
+        q: 'Standardize: Z = (95 − 100) / 2 = ?',
+        opts: ['−2.5', '−2.0', '+2.5', '−5.0'],
+        correct: 0,
+        fb_correct: '✓ Z = (95 − 100) / 2 = −5 / 2 = −2.5',
+        fb_wrong: 'Z = (x̄ − μ) / SE = (95 − 100) / 2 = −2.5'
+      },
+      {
+        q: 'Using the Z-table: P(Z < −2.5) ≈ ?',
+        opts: ['0.0062', '0.0228', '0.4938', '0.9938'],
+        correct: 0,
+        fb_correct: '✓ P(Z < −2.5) ≈ 0.0062. There is only a 0.62% chance of observing x̄ < 95.',
+        fb_wrong: 'From the standard normal table: P(Z < −2.5) ≈ 0.0062.'
+      }
+    ],
+    solution: `<h4>Full Solution</h4>
+<p><strong>(a) Standard Error:</strong><br>
+\\( SE(\\bar{X}) = \\dfrac{\\sigma}{\\sqrt{n}} = \\dfrac{10}{\\sqrt{25}} = \\dfrac{10}{5} = \\mathbf{2} \\) Ω</p>
+<p style="margin-top:12px"><strong>(b) Probability:</strong><br>
+Standardize: \\( Z = \\dfrac{95 - 100}{2} = -2.5 \\)<br><br>
+\\( P(\\bar{X} < 95) = P(Z < -2.5) \\approx \\mathbf{0.0062} \\)</p>
+<p style="margin-top:10px">Interpretation: very unlikely (~0.6% chance) to observe a sample mean below 95 when μ = 100.</p>`
+  },
+  {
+    id: 'ex72', num: 'Ex 7.2', title: 'Unbiased Estimators — Verification',
+    question: 'Show that x̄ is an unbiased estimator of μ, and explain why S² uses n−1 in its denominator.',
+    steps: [
+      {
+        q: 'What condition must hold for x̄ to be an unbiased estimator of μ?',
+        opts: [
+          'Var(x̄) = 0',
+          'E(x̄) = μ',
+          'x̄ = μ always',
+          'The sample size must be large'
+        ],
+        correct: 1,
+        fb_correct: '✓ An estimator is unbiased if E(estimator) = true parameter. Here E(x̄) = μ.',
+        fb_wrong: 'Unbiased means E(x̄) = μ. The expected value of the sample mean equals the population mean.'
+      },
+      {
+        q: 'Why does S² use n−1 and not n?',
+        opts: [
+          'To make the formula simpler',
+          'Because dividing by n gives E(S²) = (n−1)σ²/n ≠ σ² — a biased result',
+          'Because n−1 is always larger than n',
+          'It only applies when n > 30'
+        ],
+        correct: 1,
+        fb_correct: '✓ Using n gives a biased estimator. The n−1 correction (degrees of freedom) makes E(S²) = σ² exactly.',
+        fb_wrong: 'Dividing by n gives E(S²) = (n−1)σ²/n which is less than σ². Using n−1 corrects this bias.'
+      },
+      {
+        q: 'If both x̄ and the median are unbiased estimators of μ for a normal population, which is preferred?',
+        opts: [
+          'The median — always easier to compute',
+          'x̄ — it has smaller variance (more efficient)',
+          'Both are equally good',
+          'Depends on sample size only'
+        ],
+        correct: 1,
+        fb_correct: '✓ Both are unbiased, but x̄ has smaller variance for normal data — it is the minimum variance unbiased estimator (MVUE).',
+        fb_wrong: 'When two estimators are both unbiased, the one with smaller variance is preferred. For normal data, x̄ beats the median.'
+      }
+    ],
+    solution: `<h4>Full Solution</h4>
+<p><strong>Unbiasedness of x̄:</strong><br>
+\\( E(\\bar{X}) = E\\!\\left(\\dfrac{1}{n}\\sum_{i=1}^n X_i\\right) = \\dfrac{1}{n}\\sum_{i=1}^n E(X_i) = \\dfrac{1}{n}(n\\mu) = \\mu \\) ✅</p>
+<p style="margin-top:12px"><strong>Why n−1 in S²:</strong><br>
+It can be shown that \\( E\\!\\left(\\dfrac{\\sum(X_i-\\bar{X})^2}{n}\\right) = \\dfrac{n-1}{n}\\sigma^2 \\neq \\sigma^2 \\).<br>
+Dividing by n−1 instead yields \\( E(S^2) = \\sigma^2 \\) ✅ — an unbiased estimator.</p>`
+  },
+  {
+    id: 'ex73', num: 'Ex 7.3', title: 'Standard Error — Thermal Conductivity',
+    question: `Thermal conductivity measurements of 10 specimens yield a sample mean of 41.924 W/(m·K) and sample standard deviation s = 0.284.
+    <br><br>Find: (a) The standard error. &nbsp; (b) An approximate 95% confidence range using x̄ ± 2·SE.`,
+    steps: [
+      {
+        q: 'What formula gives the standard error when σ is unknown?',
+        opts: ['SE = σ / √n', 'SE = s / √n', 'SE = s × n', 'SE = s²'],
+        correct: 1,
+        fb_correct: '✓ When σ is unknown, estimate it with s: SE ≈ s / √n.',
+        fb_wrong: 'SE ≈ s / √n when the population standard deviation is unknown and estimated from the sample.'
+      },
+      {
+        q: 'Calculate SE = 0.284 / √10 ≈',
+        opts: ['0.0284', '0.0898', '0.284', '0.9'],
+        correct: 1,
+        fb_correct: '✓ SE = 0.284 / √10 = 0.284 / 3.162 ≈ 0.0898',
+        fb_wrong: 'SE = 0.284 / √10 = 0.284 / 3.162 ≈ 0.0898'
+      },
+      {
+        q: 'The approximate 95% range is x̄ ± 2·SE = 41.924 ± 2(0.0898). What is the interval?',
+        opts: [
+          '(41.744, 42.104)',
+          '(41.640, 42.208)',
+          '(41.834, 42.014)',
+          '(40.924, 42.924)'
+        ],
+        correct: 0,
+        fb_correct: '✓ 41.924 − 0.1796 = 41.744 and 41.924 + 0.1796 = 42.104. Interval: (41.744, 42.104).',
+        fb_wrong: '2 × 0.0898 = 0.1796. So: 41.924 ± 0.1796 → (41.744, 42.104).'
+      }
+    ],
+    solution: `<h4>Full Solution</h4>
+<p><strong>(a) Standard Error:</strong><br>
+\\( SE = \\dfrac{s}{\\sqrt{n}} = \\dfrac{0.284}{\\sqrt{10}} \\approx \\mathbf{0.0898} \\) W/(m·K)</p>
+<p style="margin-top:12px"><strong>(b) Approximate 95% Range:</strong><br>
+\\( \\bar{x} \\pm 2 \\cdot SE = 41.924 \\pm 2(0.0898) = 41.924 \\pm 0.1796 \\)<br>
+\\( = (\\mathbf{41.744},\\; \\mathbf{42.104}) \\)</p>
+<p style="margin-top:10px">Interpretation: we are approximately 95% confident the true mean conductivity lies in this interval.</p>`
+  },
+  {
+    id: 'ex74', num: 'Ex 7.4', title: 'Mean Squared Error (MSE)',
+    question: 'Two estimators θ̂₁ and θ̂₂ both target the same parameter θ. θ̂₁ is unbiased with Var = 9. θ̂₂ is biased with Bias = 2 and Var = 4. Which is better?',
+    steps: [
+      {
+        q: 'What is the MSE formula?',
+        opts: [
+          'MSE = Variance − Bias',
+          'MSE = Variance + Bias²',
+          'MSE = Bias / Variance',
+          'MSE = (Variance + Bias)²'
+        ],
+        correct: 1,
+        fb_correct: '✓ MSE = Var(θ̂) + [Bias(θ̂)]². It combines both sources of error.',
+        fb_wrong: 'MSE = Var(θ̂) + [Bias(θ̂)]².'
+      },
+      {
+        q: 'Calculate MSE(θ̂₁): Var = 9, Bias = 0',
+        opts: ['MSE = 9 + 0 = 9', 'MSE = 9 + 0² = 0', 'MSE = 9 × 0 = 0', 'MSE = 0'],
+        correct: 0,
+        fb_correct: '✓ MSE(θ̂₁) = 9 + 0² = 9. It is unbiased so Bias = 0.',
+        fb_wrong: 'MSE(θ̂₁) = Var + Bias² = 9 + 0 = 9. Unbiased estimators have Bias = 0.'
+      },
+      {
+        q: 'Calculate MSE(θ̂₂): Var = 4, Bias = 2. Which estimator is preferred?',
+        opts: [
+          'MSE(θ̂₂) = 8, prefer θ̂₂',
+          'MSE(θ̂₂) = 4 + 4 = 8, prefer θ̂₂ (lower MSE)',
+          'MSE(θ̂₂) = 6, prefer θ̂₁',
+          'MSE(θ̂₂) = 4 + 2 = 6, prefer θ̂₁'
+        ],
+        correct: 1,
+        fb_correct: '✓ MSE(θ̂₂) = 4 + 2² = 8. Since 8 < 9, θ̂₂ has lower MSE and is preferred overall.',
+        fb_wrong: 'MSE(θ̂₂) = Var + Bias² = 4 + 4 = 8. Since 8 < MSE(θ̂₁) = 9, prefer the biased θ̂₂.'
+      }
+    ],
+    solution: `<h4>Full Solution</h4>
+<p>\\( MSE(\\hat{\\theta}_1) = Var(\\hat{\\theta}_1) + [Bias(\\hat{\\theta}_1)]^2 = 9 + 0^2 = \\mathbf{9} \\)</p>
+<p style="margin-top:8px">\\( MSE(\\hat{\\theta}_2) = Var(\\hat{\\theta}_2) + [Bias(\\hat{\\theta}_2)]^2 = 4 + 2^2 = \\mathbf{8} \\)</p>
+<p style="margin-top:10px"><strong>Conclusion:</strong> Although θ̂₁ is unbiased and θ̂₂ is not, θ̂₂ has lower MSE (8 &lt; 9). In terms of overall accuracy across repeated samples, θ̂₂ is preferred. This illustrates that <strong>unbiased ≠ always best</strong>.</p>`
+  },
+  {
+    id: 'ex75', num: 'Ex 7.5', title: 'Method of Moments — Exponential Distribution',
+    question: 'Failure times (in hours) of 8 components are recorded. The sample mean is x̄ = 21.65 hours. Assuming an exponential distribution with parameter λ, find the moment estimator of λ.',
+    steps: [
+      {
+        q: 'For an exponential distribution, what is E(X) in terms of λ?',
+        opts: ['E(X) = λ', 'E(X) = λ²', 'E(X) = 1/λ', 'E(X) = √λ'],
+        correct: 2,
+        fb_correct: '✓ For Exponential(λ): E(X) = 1/λ.',
+        fb_wrong: 'The exponential distribution has E(X) = 1/λ.'
+      },
+      {
+        q: 'Method of moments: set E(X) = x̄. So 1/λ = x̄. What is λ̂?',
+        opts: ['λ̂ = x̄', 'λ̂ = 1/x̄', 'λ̂ = x̄²', 'λ̂ = √x̄'],
+        correct: 1,
+        fb_correct: '✓ λ̂ = 1/x̄. Solve 1/λ = x̄ for λ.',
+        fb_wrong: 'From 1/λ = x̄, solving for λ gives λ̂ = 1/x̄.'
+      },
+      {
+        q: 'Compute λ̂ = 1 / 21.65 ≈',
+        opts: ['0.0463', '21.65', '0.463', '0.00463'],
+        correct: 0,
+        fb_correct: '✓ λ̂ = 1/21.65 ≈ 0.0463 failures per hour.',
+        fb_wrong: 'λ̂ = 1/21.65 ≈ 0.0463'
+      }
+    ],
+    solution: `<h4>Full Solution</h4>
+<p>For Exponential(λ): \\( E(X) = \\dfrac{1}{\\lambda} \\)</p>
+<p style="margin-top:10px">Set population moment equal to sample moment: \\( \\dfrac{1}{\\lambda} = \\bar{x} \\)</p>
+<p>Solve: \\( \\hat{\\lambda} = \\dfrac{1}{\\bar{x}} = \\dfrac{1}{21.65} \\approx \\mathbf{0.0463} \\text{ failures/hour} \\)</p>
+<p style="margin-top:10px">Interpretation: on average, 0.0463 failures occur per hour, or equivalently, we expect one failure every 21.65 hours.</p>`
+  },
+  {
+    id: 'ex76', num: 'Ex 7.6', title: 'Method of Moments — Normal Distribution',
+    question: 'A sample of n observations is taken from a Normal(μ, σ²) population. Derive the method of moments estimators for μ and σ².',
+    steps: [
+      {
+        q: 'What are the two population moments for Normal(μ, σ²)?',
+        opts: [
+          'E(X) = σ, E(X²) = μ',
+          'E(X) = μ, E(X²) = σ² + μ²',
+          'E(X) = μ², E(X²) = σ',
+          'E(X) = μ/σ, E(X²) = μ²/σ'
+        ],
+        correct: 1,
+        fb_correct: '✓ E(X) = μ (first moment). E(X²) = Var(X) + [E(X)]² = σ² + μ² (second moment).',
+        fb_wrong: 'For any distribution: E(X²) = Var(X) + [E(X)]² = σ² + μ². Set these equal to sample moments.'
+      },
+      {
+        q: 'Setting E(X) = x̄ gives μ̂ = x̄. Solving for σ²: σ² = E(X²) − μ². What is σ̂²?',
+        opts: [
+          'σ̂² = (1/n)Σxᵢ² − x̄²',
+          'σ̂² = S² = Σ(xᵢ−x̄)²/(n−1)',
+          'σ̂² = x̄²',
+          'σ̂² = 1/x̄'
+        ],
+        correct: 0,
+        fb_correct: '✓ σ̂² = (1/n)Σxᵢ² − x̄². This is the method of moments estimator (note: divides by n, not n−1).',
+        fb_wrong: 'Substitute: σ̂² = E(X²)_sample − x̄² = (1/n)Σxᵢ² − x̄²'
+      },
+      {
+        q: 'Is the method of moments estimator σ̂² = (1/n)Σxᵢ² − x̄² unbiased?',
+        opts: [
+          'Yes — all moment estimators are unbiased',
+          'No — it divides by n, not n−1, so E(σ̂²) = (n−1)σ²/n ≠ σ²',
+          'Yes, because it uses the true parameter',
+          'Cannot determine'
+        ],
+        correct: 1,
+        fb_correct: '✓ The MOM estimator of σ² is slightly biased. The unbiased version is S² = Σ(xᵢ−x̄)²/(n−1).',
+        fb_wrong: 'Dividing by n (not n−1) makes this estimator biased. E(σ̂²) = (n−1)σ²/n ≠ σ².'
+      }
+    ],
+    solution: `<h4>Full Solution</h4>
+<p><strong>First moment:</strong> \\( E(X) = \\mu \\) → set equal to \\( \\bar{x} \\) → \\( \\hat{\\mu} = \\bar{x} \\) ✅</p>
+<p style="margin-top:10px"><strong>Second moment:</strong> \\( E(X^2) = \\sigma^2 + \\mu^2 \\) → set equal to \\( \\frac{1}{n}\\sum x_i^2 \\)<br>
+Solve for \\( \\sigma^2 \\): \\( \\hat{\\sigma}^2 = \\dfrac{1}{n}\\sum x_i^2 - \\bar{x}^2 \\)</p>
+<p style="margin-top:10px"><strong>Note:</strong> This MOM estimator is biased (divides by n). The unbiased version is \\( S^2 = \\frac{\\sum(x_i-\\bar{x})^2}{n-1} \\).</p>`
+  },
+  {
+    id: 'ex77', num: 'Ex 7.7', title: 'CLT in Practice — Non-Normal Population',
+    question: `Service times at a call center follow an exponential distribution with mean μ = 5 minutes and standard deviation σ = 5 minutes. A random sample of n = 100 calls is taken.
+    <br><br>Find P(x̄ &lt; 4.5).`,
+    steps: [
+      {
+        q: 'Can we use the normal distribution for x̄ even though service times are exponential (not normal)?',
+        opts: [
+          'No — x̄ is exponential too',
+          'Yes — CLT applies since n = 100 is large',
+          'Only if σ is small',
+          'Only if the distribution is symmetric'
+        ],
+        correct: 1,
+        fb_correct: '✓ CLT guarantees x̄ ≈ Normal for large n (100 >> 30), regardless of the original distribution.',
+        fb_wrong: 'The Central Limit Theorem applies: for n = 100 (large), x̄ ≈ Normal(μ, σ²/n) even though individual times are exponential.'
+      },
+      {
+        q: 'What is SE = σ/√n = 5/√100?',
+        opts: ['0.5', '1.0', '5.0', '50'],
+        correct: 0,
+        fb_correct: '✓ SE = 5/√100 = 5/10 = 0.5 minutes',
+        fb_wrong: 'SE = σ/√n = 5/10 = 0.5'
+      },
+      {
+        q: 'Z = (4.5 − 5) / 0.5 = ? Then find P(x̄ < 4.5) = P(Z < ?)',
+        opts: ['Z = −1, P ≈ 0.1587', 'Z = −2, P ≈ 0.0228', 'Z = +1, P ≈ 0.8413', 'Z = −0.5, P ≈ 0.3085'],
+        correct: 0,
+        fb_correct: '✓ Z = (4.5−5)/0.5 = −1. P(Z < −1) ≈ 0.1587.',
+        fb_wrong: 'Z = (4.5−5)/0.5 = −1. From Z-table: P(Z < −1) ≈ 0.1587.'
+      }
+    ],
+    solution: `<h4>Full Solution</h4>
+<p>By CLT with n = 100: \\( \\bar{X} \\approx N\\!\\left(5,\\; \\dfrac{25}{100}\\right) = N(5,\\; 0.25) \\), so \\( SE = 0.5 \\)</p>
+<p style="margin-top:10px">Standardize: \\( Z = \\dfrac{4.5 - 5}{0.5} = -1 \\)</p>
+<p>\\( P(\\bar{X} < 4.5) = P(Z < -1) \\approx \\mathbf{0.1587} \\)</p>
+<p style="margin-top:10px">Note: if n were small (say n = 5), we could NOT use the normal approximation for this exponential distribution.</p>`
+  },
+  {
+    id: 'ex78', num: 'Ex 7.8', title: 'Comparing Estimators — Efficiency',
+    question: `Two unbiased estimators of μ are proposed for a normal population:
+    <br>• Estimator A = sample mean x̄ with Var(A) = σ²/n
+    <br>• Estimator B = sample median with Var(B) ≈ πσ²/(2n)
+    <br><br>Which is more efficient, and by how much?`,
+    steps: [
+      {
+        q: 'What does "more efficient" mean for unbiased estimators?',
+        opts: [
+          'Faster to compute',
+          'Smaller variance — more consistent across repeated samples',
+          'Closer to the median',
+          'Larger sample size required'
+        ],
+        correct: 1,
+        fb_correct: '✓ Efficiency of an unbiased estimator is judged entirely by its variance. Smaller variance = more efficient.',
+        fb_wrong: 'For unbiased estimators, efficiency is determined by variance. Smaller variance → more efficient → preferred.'
+      },
+      {
+        q: 'Compare: Var(x̄) = σ²/n vs Var(median) ≈ πσ²/(2n). Since π/2 ≈ 1.571, which is smaller?',
+        opts: [
+          'Var(median) < Var(x̄)',
+          'Var(x̄) < Var(median) since 1 < π/2 ≈ 1.571',
+          'They are equal',
+          'Depends on n'
+        ],
+        correct: 1,
+        fb_correct: '✓ Var(x̄) = σ²/n vs Var(median) ≈ 1.571·σ²/n. Since 1 < 1.571, x̄ has smaller variance.',
+        fb_wrong: 'Var(x̄) = 1·(σ²/n) vs Var(median) ≈ 1.571·(σ²/n). The sample mean wins: 1 < 1.571.'
+      },
+      {
+        q: 'The relative efficiency = Var(median)/Var(x̄) = π/2 ≈ 1.571. What does this mean?',
+        opts: [
+          'The median requires 57.1% fewer observations',
+          'The median requires about 57.1% MORE observations to match the precision of x̄',
+          'x̄ and the median have the same precision',
+          'x̄ requires 1.571 times more data'
+        ],
+        correct: 1,
+        fb_correct: '✓ Relative efficiency ≈ 1.571 means you need π/2 ≈ 1.57 times as many observations using the median to achieve the same precision as x̄.',
+        fb_wrong: 'Relative efficiency = Var(B)/Var(A) = 1.571 means the median needs ~57% more data to match x̄ precision.'
+      }
+    ],
+    solution: `<h4>Full Solution</h4>
+<p>Both estimators are unbiased for μ. Compare variances:</p>
+<p>\\( Var(\\bar{X}) = \\dfrac{\\sigma^2}{n} \\quad \\text{vs} \\quad Var(\\text{median}) \\approx \\dfrac{\\pi\\sigma^2}{2n} \\approx \\dfrac{1.571\\sigma^2}{n} \\)</p>
+<p style="margin-top:10px">Since \\( 1 < \\pi/2 \\approx 1.571 \\), the <strong>sample mean x̄ is more efficient</strong>.</p>
+<p style="margin-top:10px">Relative efficiency: \\( \\dfrac{Var(\\text{median})}{Var(\\bar{X})} = \\dfrac{\\pi}{2} \\approx 1.571 \\)</p>
+<p>This means the median requires approximately 57% more observations than x̄ to achieve the same estimation precision.</p>`
+  }
+];
+
+// ===================== MOCK TEST DATA =====================
+const mockQuestions = [
+  // SECTION A — Conceptual MCQ
+  { id:'m1', section:'A', type:'mcq',
+    text: 'Which of the following is a PARAMETER, not a statistic?',
+    opts: ['Sample mean x̄', 'Sample variance S²', 'Population mean μ', 'Sample standard deviation s'],
+    correct: 2,
+    explanation: 'Parameters describe the population (μ, σ², p). Statistics are computed from sample data (x̄, S², etc.).'
+  },
+  { id:'m2', section:'A', type:'mcq',
+    text: 'An estimator is unbiased if:',
+    opts: ['Its variance equals zero', 'E(θ̂) = θ — expected value equals the true parameter', 'It always equals the true value', 'It requires a large sample'],
+    correct: 1,
+    explanation: 'Unbiased means E(θ̂) = θ. The estimator is correct on average, even though individual estimates vary.'
+  },
+  { id:'m3', section:'A', type:'mcq',
+    text: 'The Central Limit Theorem states that for large n:',
+    opts: [
+      'Individual data values become normally distributed',
+      'The sample mean x̄ is approximately normally distributed',
+      'The population becomes normal',
+      'The variance of x̄ increases'
+    ],
+    correct: 1,
+    explanation: 'The CLT applies to the distribution of x̄, not individual observations. For large n, x̄ ≈ N(μ, σ²/n).'
+  },
+  { id:'m4', section:'A', type:'mcq',
+    text: 'If n increases from 25 to 100 (keeping σ constant), the standard error SE = σ/√n:',
+    opts: ['Doubles', 'Halves', 'Quadruples', 'Stays the same'],
+    correct: 1,
+    explanation: 'SE = σ/√n. Doubling n multiplies SE by 1/√2. Quadrupling n (25→100) halves SE: σ/√100 = σ/10 vs σ/√25 = σ/5.'
+  },
+  { id:'m5', section:'A', type:'mcq',
+    text: 'The MSE of an unbiased estimator equals:',
+    opts: ['Zero', 'The bias squared', 'The variance of the estimator', 'The variance plus the bias'],
+    correct: 2,
+    explanation: 'MSE = Var + Bias². For an unbiased estimator, Bias = 0, so MSE = Var(θ̂) only.'
+  },
+  { id:'m6', section:'A', type:'mcq',
+    text: 'For an exponential distribution with E(X) = 1/λ, the method of moments estimator of λ is:',
+    opts: ['λ̂ = x̄', 'λ̂ = 1/x̄', 'λ̂ = x̄²', 'λ̂ = √x̄'],
+    correct: 1,
+    explanation: 'Set E(X) = x̄: 1/λ = x̄. Solve: λ̂ = 1/x̄.'
+  },
+  // SECTION B — Core Problems
+  { id:'m7', section:'B', type:'mcq',
+    text: 'Population: μ = 50, σ = 8. Sample size n = 16. What is Var(x̄)?',
+    opts: ['64', '4', '8', '2'],
+    correct: 1,
+    explanation: 'Var(x̄) = σ²/n = 64/16 = 4.'
+  },
+  { id:'m8', section:'B', type:'mcq',
+    text: 'Same population (μ=50, σ=8, n=16). Find P(x̄ > 52). SE = 2. Z = (52−50)/2 = 1.',
+    opts: ['P(Z>1) ≈ 0.1587', 'P(Z>1) ≈ 0.8413', 'P(Z>1) ≈ 0.50', 'P(Z>1) ≈ 0.0228'],
+    correct: 0,
+    explanation: 'P(x̄ > 52) = P(Z > 1) = 1 − Φ(1) = 1 − 0.8413 = 0.1587.'
+  },
+  { id:'m9', section:'B', type:'mcq',
+    text: 'Two unbiased estimators: θ̂₁ with Var=5 and θ̂₂ with Var=8. Which is preferred and why?',
+    opts: [
+      'θ̂₂ — larger variance means more information',
+      'θ̂₁ — smaller variance means more efficient',
+      'Both are equally good since both are unbiased',
+      'Depends on sample size'
+    ],
+    correct: 1,
+    explanation: 'When both estimators are unbiased, the one with smaller variance is more efficient and preferred. θ̂₁ wins with Var=5.'
+  },
+  { id:'m10', section:'B', type:'mcq',
+    text: 'A random variable has E(X) = μ and Var(X) = σ². For a sample of size n, what is E(x̄²)?',
+    opts: ['μ²', 'σ²/n + μ²', 'σ²/n', 'σ² + μ²'],
+    correct: 1,
+    explanation: 'E(x̄²) = Var(x̄) + [E(x̄)]² = σ²/n + μ². This follows from the identity E(X²) = Var(X) + [E(X)]².'
+  },
+  // SECTION C — Calculation
+  { id:'m11', section:'C', type:'calc',
+    text: 'An estimator has Variance = 16 and Bias = 3. Calculate the MSE. [Formula: MSE = Var + Bias²]',
+    answer: '25',
+    tolerance: 0.01,
+    explanation: 'MSE = Var + Bias² = 16 + 3² = 16 + 9 = 25'
+  },
+  { id:'m12', section:'C', type:'calc',
+    text: 'Population σ = 12, sample size n = 36. Calculate the standard error SE = σ/√n.',
+    answer: '2',
+    tolerance: 0.01,
+    explanation: 'SE = 12 / √36 = 12 / 6 = 2'
+  },
+];
+
+// ===================== CHEAT SHEET DATA =====================
+const cheatFormulas = [
+  { title: 'Sampling Distribution of x̄', formula: 'If X ~ N(μ, σ²):\nx̄ ~ N(μ, σ²/n)\nE(x̄) = μ,  Var(x̄) = σ²/n', note: 'Mean stays the same; variance shrinks by factor n.' },
+  { title: 'Central Limit Theorem', formula: 'For large n (≥ 30):\nx̄ ≈ N(μ, σ²/n)\nregardless of population shape', note: 'Applies to x̄, NOT to individual observations.' },
+  { title: 'Standard Error', formula: 'SE = σ/√n  (σ known)\nSE ≈ s/√n  (σ unknown)', note: 'Measures precision of x̄. Smaller SE = better estimate.' },
+  { title: 'Standardizing x̄', formula: 'Z = (x̄ − μ) / (σ/√n)', note: 'Use this to convert probability questions about x̄ to Z-table lookups.' },
+  { title: 'Unbiased Estimator', formula: 'E(θ̂) = θ\nE(x̄) = μ  [always]\nE(S²) = σ²  [always]', note: 'S² requires n−1 denominator to be unbiased.' },
+  { title: 'Mean Squared Error', formula: 'MSE(θ̂) = Var(θ̂) + [Bias(θ̂)]²\nBias = E(θ̂) − θ', note: 'For unbiased estimators: Bias = 0 so MSE = Var.' },
+  { title: 'Method of Moments', formula: 'Set E(X) = x̄  (1st moment)\nSet E(X²) = (1/n)Σxᵢ²  (2nd moment)\nThen solve for parameters', note: 'Works for any distribution. Always start with E(X) = x̄.' },
+  { title: 'Exponential MOM Estimator', formula: 'E(X) = 1/λ → λ̂ = 1/x̄', note: 'Most common MOM result on exams. Easy to derive.' },
+  { title: 'Normal MOM Estimators', formula: 'μ̂ = x̄\nσ̂² = (1/n)Σxᵢ² − x̄²', note: 'Note: MOM variance estimator divides by n (slightly biased). Unbiased version uses n−1.' },
+  { title: 'Efficiency Comparison', formula: 'If E(θ̂₁) = E(θ̂₂) = θ:\nPrefer θ̂ with smaller Var', note: 'For normal data, x̄ is MVUE (minimum variance unbiased estimator) of μ.' },
+  { title: 'Effect of Sample Size', formula: 'SE = σ/√n ↓ as n ↑\nVar(x̄) = σ²/n ↓ as n ↑\nMSE ↓ as n ↑', note: 'Larger sample = more precision. Always.' },
+  { title: 'Key Identities', formula: 'E(X²) = Var(X) + [E(X)]²\nVar(x̄) = σ²/n\nE(x̄²) = σ²/n + μ²', note: 'E(X²) identity is very useful for deriving MOM estimators.' },
+];
+
+const traps = [
+  { label: 'Statistic vs Parameter', text: 'μ and σ² are population parameters (fixed, unknown). x̄ and S² are sample statistics (computed, known). Never confuse them.' },
+  { label: 'SE ≠ Standard Deviation', text: 'SE = σ/√n measures spread of x̄. Standard deviation σ measures spread of individual values. They differ by a factor of √n.' },
+  { label: 'CLT applies to x̄ only', text: 'The Central Limit Theorem makes x̄ approximately normal for large n — NOT the individual observations. Individuals may still be skewed.' },
+  { label: 'Unbiased ≠ Best', text: 'An unbiased estimator can have higher MSE than a biased one with much smaller variance. Always compare MSE, not just bias.' },
+  { label: 'MOM σ̂² uses n (biased)', text: 'The method of moments gives σ̂² = (1/n)Σxᵢ² − x̄², which divides by n and is biased. The unbiased S² divides by n−1.' },
+  { label: 'Larger n decreases SE', text: 'SE = σ/√n shrinks as n grows. Never say larger n increases SE or variance of x̄ — it is always the opposite.' },
+];
+
+// ===================== RENDER SUMMARY =====================
+function renderSummary() {
+  const grid = document.getElementById('concepts-grid');
+  grid.innerHTML = concepts.map((c, i) => `
+    <div class="concept-card">
+      <div class="concept-header" onclick="toggleConcept(${i})" id="ch-${i}">
+        <div class="concept-title-wrap">
+          <div class="concept-num">${c.num}</div>
+          <span class="concept-title">${c.title}</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px">
+          <span class="concept-badge ${c.importance === 'HIGHLY TESTED' || c.importance === 'EXAM TRAP' ? 'high' : ''}">${c.importance}</span>
+          <span class="concept-chevron">▾</span>
+        </div>
+      </div>
+      <div class="concept-body" id="cb-${i}">${c.body}</div>
+    </div>
+  `).join('');
+  toggleConcept(0);
+}
+
+function toggleConcept(i) {
+  const hdr = document.getElementById('ch-'+i);
+  const body = document.getElementById('cb-'+i);
+  const isOpen = body.classList.contains('open');
+  body.classList.toggle('open', !isOpen);
+  hdr.classList.toggle('open', !isOpen);
+}
+
+// ===================== RENDER EXAMPLES =====================
+function renderExamples() {
+  const cont = document.getElementById('examples-container');
+  cont.innerHTML = examples.map(ex => {
+    const tableHTML = ex.table ? `
+      <table class="prob-table">
+        <thead><tr>${ex.table.headers.map(h=>`<th>${h}</th>`).join('')}</tr></thead>
+        <tbody>${ex.table.rows.map(r=>`<tr>${r.map(c=>`<td>${c}</td>`).join('')}</tr>`).join('')}</tbody>
+      </table>` : '';
+
+    const stepsHTML = ex.steps.map((s, si) => `
+      <div class="step" id="step-${ex.id}-${si}">
+        <div class="step-question">Step ${si+1}: ${s.q}</div>
+        <div class="step-options">
+          ${s.opts.map((o,oi) => `
+            <button class="step-option" onclick="checkStep('${ex.id}',${si},${oi},${s.correct})">${o}</button>
+          `).join('')}
+        </div>
+        <div class="step-feedback" id="sfb-${ex.id}-${si}"></div>
+      </div>
+    `).join('');
+
+    return `
+      <div class="example-card">
+        <div class="example-header">
+          <span class="ex-num">${ex.num}</span>
+          <h3>${ex.title}</h3>
+        </div>
+        <div class="example-body">
+          <p>${ex.question}</p>
+          ${tableHTML}
+          <div class="steps-container">${stepsHTML}</div>
+          <button class="show-solution-btn" onclick="toggleSolution('${ex.id}')">Show Full Solution ▾</button>
+          <div class="full-solution" id="sol-${ex.id}">${ex.solution}</div>
+        </div>
+      </div>
+    `;
+  }).join('');
+
+  if (window.MathJax) MathJax.typesetPromise();
+}
+
+function checkStep(exId, stepIdx, chosen, correct) {
+  const stepEl = document.getElementById(`step-${exId}-${stepIdx}`);
+  const fbEl = document.getElementById(`sfb-${exId}-${stepIdx}`);
+  const ex = examples.find(e=>e.id===exId);
+  const step = ex.steps[stepIdx];
+  const btns = stepEl.querySelectorAll('.step-option');
+
+  btns.forEach(b => b.disabled = true);
+
+  const isCorrect = chosen === correct;
+  btns[chosen].classList.add(isCorrect ? 'selected-correct' : 'selected-wrong');
+  if (!isCorrect) btns[correct].classList.add('reveal-correct');
+
+  fbEl.textContent = isCorrect ? step.fb_correct : '✗ ' + step.fb_wrong;
+  fbEl.className = `step-feedback show ${isCorrect ? 'correct-fb' : 'wrong-fb'}`;
+  stepEl.classList.add(isCorrect ? 'correct' : 'wrong');
+}
+
+function toggleSolution(exId) {
+  const sol = document.getElementById('sol-'+exId);
+  sol.classList.toggle('show');
+  if (window.MathJax) MathJax.typesetPromise();
+}
+
+// ===================== RENDER MOCK =====================
+let mockAnswers = {};
+let timerInterval = null;
+let timeLeft = 25 * 60;
+let mockSubmitted = false;
+
+function renderMock() {
+  const cont = document.getElementById('mock-container');
+  const sections = { A: [], B: [], C: [] };
+  mockQuestions.forEach(q => sections[q.section].push(q));
+
+  let html = '';
+  for (const [sec, qs] of Object.entries(sections)) {
+    const labels = { A:'Section A — Conceptual MCQs', B:'Section B — Core Problems', C:'Section C — Calculations' };
+    html += `<div class="mock-section-title">${labels[sec]}</div>`;
+    qs.forEach(q => {
+      const globalIdx = mockQuestions.indexOf(q) + 1;
+
+      if (q.type === 'mcq') {
+        html += `
+          <div class="mock-q" id="mq-${q.id}">
+            <div class="mock-q-num">Q${globalIdx}</div>
+            <div class="mock-q-text">${q.text}</div>
+            <div class="mock-opts">
+              ${q.opts.map((o,oi)=>`
+                <div class="mock-opt" id="mopt-${q.id}-${oi}" onclick="selectMockOpt('${q.id}',${oi})">
+                  <div class="opt-letter">${['A','B','C','D'][oi]}</div>
+                  <span>${o}</span>
+                </div>
+              `).join('')}
+            </div>
+            <div class="mock-q-feedback" id="mfb-${q.id}"></div>
+          </div>`;
+      } else {
+        html += `
+          <div class="mock-q" id="mq-${q.id}">
+            <div class="mock-q-num">Q${globalIdx}</div>
+            <div class="mock-q-text">${q.text}</div>
+            <div class="calc-input-wrap">
+              <input type="number" step="any" class="calc-input" id="calc-${q.id}" placeholder="Your answer">
+              <button class="calc-btn" onclick="checkCalc('${q.id}')">Check</button>
+            </div>
+            <div class="mock-q-feedback" id="mfb-${q.id}"></div>
+          </div>`;
+      }
+    });
+  }
+  cont.innerHTML = html;
+  updateMockProgress();
+}
+
+function selectMockOpt(qId, chosen) {
+  if (mockSubmitted) return;
+  const opts = document.querySelectorAll(`[id^="mopt-${qId}-"]`);
+  opts.forEach(o => o.classList.remove('selected'));
+  opts[chosen].classList.add('selected');
+  mockAnswers[qId] = chosen;
+  updateMockProgress();
+}
+
+function checkCalc(qId) {
+  if (mockSubmitted) return;
+  const val = parseFloat(document.getElementById('calc-'+qId).value);
+  mockAnswers[qId] = val;
+  updateMockProgress();
+}
+
+function updateMockProgress() {
+  const answered = Object.keys(mockAnswers).length;
+  document.getElementById('mock-progress').style.width = (answered/mockQuestions.length*100)+'%';
+}
+
+function submitMock() {
+  if (mockSubmitted) return;
+  mockSubmitted = true;
+  clearInterval(timerInterval);
+  document.getElementById('submit-btn').disabled = true;
+
+  let totalScore = 0, mcqScore = 0, calcScore = 0;
+
+  mockQuestions.forEach(q => {
+    const qEl = document.getElementById('mq-'+q.id);
+    const fbEl = document.getElementById('mfb-'+q.id);
+
+    if (q.type === 'mcq') {
+      const chosen = mockAnswers[q.id];
+      const correct = q.correct;
+      const opts = document.querySelectorAll(`[id^="mopt-${q.id}-"]`);
+      opts.forEach(o => { o.classList.add('disabled'); o.style.pointerEvents='none'; });
+
+      if (chosen !== undefined) {
+        const isCorrect = chosen === correct;
+        if (isCorrect) { totalScore++; mcqScore++; }
+        opts[chosen].classList.remove('selected');
+        opts[chosen].classList.add(isCorrect ? 'correct-ans' : 'wrong-ans');
+        opts[correct].classList.add('correct-ans');
+        qEl.classList.add(isCorrect ? 'answered-correct' : 'answered-wrong');
+        fbEl.textContent = (isCorrect ? '✓ Correct! ' : '✗ Incorrect. ') + q.explanation;
+        fbEl.className = `mock-q-feedback show ${isCorrect ? 'fb-correct' : 'fb-wrong'}`;
+      } else {
+        opts[correct].classList.add('correct-ans');
+        qEl.classList.add('answered-wrong');
+        fbEl.textContent = '— Not answered. Correct: ' + q.opts[correct] + '. ' + q.explanation;
+        fbEl.className = 'mock-q-feedback show fb-wrong';
+      }
+    } else {
+      const val = mockAnswers[q.id];
+      const expected = parseFloat(q.answer);
+      const isCorrect = val !== undefined && !isNaN(val) && Math.abs(val - expected) <= q.tolerance;
+      if (isCorrect) { totalScore++; calcScore++; }
+      const inp = document.getElementById('calc-'+q.id);
+      inp.disabled = true;
+      inp.style.borderColor = isCorrect ? 'var(--green)' : 'var(--red)';
+      qEl.classList.add(isCorrect ? 'answered-correct' : 'answered-wrong');
+      fbEl.textContent = (isCorrect ? '✓ Correct! ' : `✗ Expected ≈ ${q.answer}. `) + q.explanation;
+      fbEl.className = `mock-q-feedback show ${isCorrect ? 'fb-correct' : 'fb-wrong'}`;
+    }
+  });
+
+  const total = mockQuestions.length;
+  document.getElementById('results-score').textContent = `${totalScore}/${total}`;
+  document.getElementById('res-mcq').textContent = `${mcqScore}/10`;
+  document.getElementById('res-calc').textContent = `${calcScore}/2`;
+  document.getElementById('res-pct').textContent = `${Math.round(totalScore/total*100)}%`;
+  document.getElementById('results-panel').classList.add('show');
+  document.getElementById('results-panel').scrollIntoView({behavior:'smooth', block:'center'});
+}
+
+function resetMock() {
+  mockAnswers = {};
+  mockSubmitted = false;
+  timeLeft = 25 * 60;
+  document.getElementById('submit-btn').disabled = false;
+  document.getElementById('results-panel').classList.remove('show');
+  renderMock();
+  startTimer();
+}
+
+function startTimer() {
+  clearInterval(timerInterval);
+  timerInterval = setInterval(() => {
+    timeLeft--;
+    const m = Math.floor(timeLeft/60).toString().padStart(2,'0');
+    const s = (timeLeft%60).toString().padStart(2,'0');
+    document.getElementById('timer-display').textContent = `${m}:${s}`;
+    if (timeLeft <= 0) { clearInterval(timerInterval); submitMock(); }
+    if (timeLeft <= 300) document.getElementById('timer-display').style.color = '#ef4444';
+  }, 1000);
+}
+
+// ===================== RENDER CHEAT SHEET =====================
+function renderCheatSheet() {
+  document.getElementById('cheat-grid').innerHTML = cheatFormulas.map(f => `
+    <div class="cheat-card">
+      <h4>${f.title}</h4>
+      <div class="formula">${f.formula.replace(/\n/g,'<br>')}</div>
+      <div class="note">💡 ${f.note}</div>
+    </div>
+  `).join('');
+
+  document.getElementById('trap-list').innerHTML = traps.map(t => `
+    <li><strong>⚠️ ${t.label}</strong> ${t.text}</li>
+  `).join('');
+}
+
+// ===================== TAB SWITCHING =====================
+function switchTab(name) {
+  document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(el => el.classList.remove('active'));
+  document.getElementById('tab-'+name).classList.add('active');
+  const tabs = ['summary','examples','mock','cheatsheet'];
+  document.querySelectorAll('.nav-tab')[tabs.indexOf(name)].classList.add('active');
+
+  if (name === 'mock' && !timerInterval) startTimer();
+  if (window.MathJax) MathJax.typesetPromise();
+}
+
+// ===================== INIT =====================
+renderSummary();
+renderExamples();
+renderMock();
+renderCheatSheet();
+if (window.MathJax) MathJax.typesetPromise();
+</script>
+</body>
+</html>
